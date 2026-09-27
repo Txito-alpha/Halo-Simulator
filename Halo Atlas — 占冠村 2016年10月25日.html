@@ -1,0 +1,1985 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070a14">
+<title>Halo Atlas — 占冠村 2016年10月25日</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Noto+Serif+JP:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* snow (light) */
+  --night: #070a14;
+  --panel: rgba(243, 245, 249, 0.92);
+  --panel-line: rgba(27, 34, 51, 0.12);
+  --ink: #1b2233;
+  --ink-2: #4d566b;
+  --ink-3: #7d8598;
+  --brass: #7a5a22;
+  --brass-soft: rgba(122, 90, 34, 0.14);
+  --well: rgba(27, 34, 51, 0.045);
+  --well-line: rgba(27, 34, 51, 0.14);
+  --on: rgba(122, 90, 34, 0.10);
+  --on-line: rgba(122, 90, 34, 0.55);
+  --track: rgba(27, 34, 51, 0.18);
+  --thumb: #7a5a22;
+  /* text drawn directly on the sky, which is always night */
+  --sky-ink: #e6ecf7;
+  --sky-ink-2: #8e97ae;
+  --sky-brass: #c9a56a;
+
+  --serif-jp: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+  --serif-en: 'Cormorant Garamond', 'Noto Serif JP', Georgia, serif;
+  --rail: 64px;
+
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --panel: rgba(12, 17, 32, 0.86);
+    --panel-line: rgba(180, 198, 240, 0.10);
+    --ink: #e6ecf7;
+    --ink-2: #a3acc2;
+    --ink-3: #6f7890;
+    --brass: #c9a56a;
+    --brass-soft: rgba(201, 165, 106, 0.16);
+    --well: rgba(180, 198, 240, 0.04);
+    --well-line: rgba(180, 198, 240, 0.12);
+    --on: rgba(201, 165, 106, 0.10);
+    --on-line: rgba(201, 165, 106, 0.55);
+    --track: rgba(180, 198, 240, 0.20);
+    --thumb: #c9a56a;
+  }
+}
+:root[data-theme="dark"] {
+  --panel: rgba(12, 17, 32, 0.86);
+  --panel-line: rgba(180, 198, 240, 0.10);
+  --ink: #e6ecf7;
+  --ink-2: #a3acc2;
+  --ink-3: #6f7890;
+  --brass: #c9a56a;
+  --brass-soft: rgba(201, 165, 106, 0.16);
+  --well: rgba(180, 198, 240, 0.04);
+  --well-line: rgba(180, 198, 240, 0.12);
+  --on: rgba(201, 165, 106, 0.10);
+  --on-line: rgba(201, 165, 106, 0.55);
+  --track: rgba(180, 198, 240, 0.20);
+  --thumb: #c9a56a;
+}
+
+*, *::before, *::after { box-sizing: inherit; margin: 0; padding: 0; }
+html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  height: 100%; overflow: hidden;
+  background: var(--night); color: var(--ink);
+  font-family: var(--serif-jp); font-size: 15px; line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none; user-select: none;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+}
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; touch-action: manipulation; }
+:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.num { font-family: var(--serif-en); font-variant-numeric: lining-nums tabular-nums; }
+
+/* ── sky ───────────────────────────────── */
+#sky {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  display: block; touch-action: none; cursor: grab;
+}
+#sky:active { cursor: grabbing; }
+
+/* ── HUD over the sky ──────────────────── */
+#hud {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 5;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) calc(env(safe-area-inset-right, 0px) + 16px) 0 calc(env(safe-area-inset-left, 0px) + 16px);
+  pointer-events: none;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6), 0 0 2px rgba(0, 0, 0, 0.45);
+}
+.hud-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.mode-pill {
+  pointer-events: auto; display: inline-flex; padding: 3px; border-radius: 999px;
+  background: rgba(7, 10, 20, 0.55); border: 1px solid rgba(230, 236, 247, 0.18);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  text-shadow: none;
+}
+.mode-pill button {
+  min-height: 34px; padding: 0 15px; border-radius: 999px;
+  color: var(--sky-ink-2); font-size: 0.78rem;
+}
+.mode-pill button[aria-pressed="true"] { background: rgba(201, 165, 106, 0.26); color: var(--sky-ink); }
+.real-only { display: none; }
+body[data-render="real"] .real-only { display: block; }
+.wordmark {
+  font-family: var(--serif-en); font-weight: 600;
+  font-size: 1.6rem; line-height: 1; letter-spacing: 0.015em;
+  color: var(--sky-ink);
+}
+.where { font-size: 0.68rem; color: var(--sky-ink-2); margin-top: 0.4rem; letter-spacing: 0.04em; }
+.readout { text-align: right; font-size: 0.7rem; color: var(--sky-ink-2); line-height: 1.5; white-space: nowrap; }
+.readout .num { font-size: 1.05rem; color: var(--sky-brass); margin: 0 0.1em 0 0.25em; }
+
+#hint {
+  position: fixed; left: 50%; top: 45%; z-index: 6;
+  transform: translate(-50%, -50%);
+  padding: 0.55rem 1.1rem; border-radius: 999px;
+  background: rgba(7, 10, 20, 0.74); color: var(--sky-ink);
+  font-size: 0.8rem; white-space: nowrap;
+  pointer-events: none; opacity: 0; transition: opacity 0.6s;
+}
+#hint.show { opacity: 1; }
+
+/* ── controls: portrait = bottom sheet + dock ── */
+#ui {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  display: flex; flex-direction: column;
+  pointer-events: none;
+}
+#sheet, #dock {
+  pointer-events: auto;
+  background: var(--panel);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+}
+#sheet {
+  border-top: 1px solid var(--panel-line);
+  max-height: 46vh; max-height: 46svh;
+  overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  padding: 14px calc(env(safe-area-inset-right, 0px) + 16px) 14px calc(env(safe-area-inset-left, 0px) + 16px);
+}
+#ui[data-open=""] #sheet { display: none; }
+.panel { display: none; }
+#ui[data-open="sun"]  .panel[data-panel="sun"],
+#ui[data-open="view"] .panel[data-panel="view"],
+#ui[data-open="phen"] .panel[data-panel="phen"],
+#ui[data-open="disp"] .panel[data-panel="disp"] { display: block; }
+
+#dock {
+  display: flex;
+  border-top: 1px solid var(--panel-line);
+  padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+.tab {
+  position: relative; flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  min-height: 58px; color: var(--ink-3); font-size: 0.7rem;
+}
+.tab svg { width: 22px; height: 22px; }
+.tab[aria-selected="true"] { color: var(--brass); }
+.tab[aria-selected="true"]::before {
+  content: ''; position: absolute; top: 0; left: 50%;
+  width: 24px; height: 2px; margin-left: -12px;
+  background: var(--brass); border-radius: 0 0 2px 2px;
+}
+
+/* sliders */
+.ctl + .ctl { margin-top: 10px; }
+.ctl-head { display: flex; justify-content: space-between; align-items: baseline; }
+.ctl-head label { font-size: 0.82rem; color: var(--ink-2); }
+.ctl-head .unit { font-size: 0.7rem; color: var(--ink-3); margin-left: 0.3em; }
+.ctl-head output {
+  font-family: var(--serif-en); font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-size: 1.4rem; line-height: 1.2; color: var(--ink);
+}
+.ctl-row { display: flex; align-items: center; gap: 10px; }
+.step {
+  flex: none; width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid var(--well-line); background: var(--well);
+  font-family: var(--serif-en); font-size: 1.35rem; line-height: 1; color: var(--ink);
+}
+.step:active { background: var(--brass-soft); }
+input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  flex: 1; width: 100%; height: 40px; margin: 0;
+  background: transparent; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: var(--track); }
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 26px; height: 26px; margin-top: -11px; border-radius: 50%;
+  background: var(--thumb);
+  box-shadow: 0 0 0 5px var(--brass-soft), 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+input[type="range"]::-moz-range-track { height: 4px; border-radius: 2px; background: var(--track); }
+input[type="range"]::-moz-range-thumb {
+  width: 26px; height: 26px; border: 0; border-radius: 50%;
+  background: var(--thumb); box-shadow: 0 0 0 5px var(--brass-soft);
+}
+
+/* buttons */
+.wide {
+  display: block; width: 100%; margin-top: 14px; min-height: 44px;
+  border-radius: 12px; border: 1px solid var(--on-line);
+  background: var(--on); color: var(--brass); font-size: 0.86rem;
+}
+.grid2, .grid3, .grid4 { display: grid; gap: 6px; }
+.grid2 { grid-template-columns: repeat(2, 1fr); }
+.grid3 { grid-template-columns: repeat(3, 1fr); }
+.grid4 { grid-template-columns: repeat(4, 1fr); }
+.opt {
+  min-height: 44px; padding: 4px 6px; border-radius: 12px;
+  border: 1px solid var(--well-line); background: var(--well);
+  color: var(--ink-2); font-size: 0.8rem; line-height: 1.3;
+}
+.opt[aria-pressed="true"] { border-color: var(--on-line); background: var(--on); color: var(--ink); }
+.gap { margin-top: 14px; }
+h3 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin: 16px 0 6px; }
+.note { font-size: 0.72rem; color: var(--ink-3); margin-top: 12px; line-height: 1.65; }
+
+/* phenomena chips */
+.chips-head { display: flex; gap: 6px; margin-bottom: 10px; }
+.chips-head button {
+  flex: 1; min-height: 36px; border-radius: 10px;
+  border: 1px solid var(--well-line); background: var(--well);
+  font-size: 0.76rem; color: var(--ink-2);
+}
+.chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(146px, 1fr)); gap: 6px; }
+.chip {
+  display: flex; align-items: center; gap: 9px;
+  min-height: 50px; padding: 6px 9px; border-radius: 12px;
+  border: 1px solid var(--well-line); background: var(--well);
+  text-align: left;
+}
+.chip .sw { flex: none; width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 0 1px var(--well-line); }
+.chip .nm { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.chip .jp { font-size: 0.78rem; color: var(--ink); line-height: 1.3; word-break: keep-all; overflow-wrap: anywhere; }
+.chip .en {
+  font-family: var(--serif-en); font-style: italic; font-size: 0.76rem;
+  color: var(--ink-3); line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.chip .tags { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 0.6rem; color: var(--brass); white-space: nowrap; }
+.chip .absent-tag { display: none; color: var(--ink-3); }
+.chip.absent .absent-tag { display: block; }
+.chip[aria-pressed="true"] { border-color: var(--on-line); background: var(--on); }
+.chip[aria-pressed="false"] .nm, .chip[aria-pressed="false"] .tags { opacity: 0.5; }
+.chip[aria-pressed="false"] .sw { background: transparent !important; box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+.chip.absent[aria-pressed="true"] .sw { opacity: 0.35; }
+
+/* ── landscape: side rail + side sheet ── */
+@media (orientation: landscape) {
+  #ui { top: 0; bottom: 0; left: auto; flex-direction: row; }
+  #sheet {
+    width: min(340px, 46vw); height: 100%; max-height: none;
+    border-top: 0; border-left: 1px solid var(--panel-line);
+    padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(env(safe-area-inset-bottom, 0px) + 16px) 16px;
+  }
+  #dock {
+    flex-direction: column; justify-content: center; gap: 4px;
+    width: calc(var(--rail) + env(safe-area-inset-right, 0px));
+    border-top: 0; border-left: 1px solid var(--panel-line);
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) 0;
+  }
+  .tab { flex: 0 0 auto; min-height: 62px; }
+  .tab[aria-selected="true"]::before { top: 50%; left: 0; width: 2px; height: 24px; margin: -12px 0 0 0; border-radius: 0 2px 2px 0; }
+  #hud { right: auto; flex-direction: column; gap: 10px; }
+  .hud-right { align-items: flex-start; }
+  .readout { text-align: left; }
+  .readout .num { margin: 0 0.1em 0 0.25em; }
+  .grid4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1000px) and (min-height: 640px) {
+  .wordmark { font-size: 2.2rem; }
+  .where { font-size: 0.78rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #hint { transition: none; }
+}
+</style>
+</head>
+<body>
+<canvas id="sky" aria-label="天球。ドラッグで見回し、ピンチで拡大縮小"></canvas>
+
+<header id="hud">
+  <div class="brand">
+    <div class="wordmark">Halo Atlas</div>
+    <div class="where">占冠村　2016年10月25日 12:00</div>
+  </div>
+  <div class="hud-right">
+    <div class="readout" id="readout" aria-live="polite"></div>
+    <div class="mode-pill" role="group" aria-label="表示モード">
+      <button class="mbtn" data-render="diagram" aria-pressed="false">図解</button>
+      <button class="mbtn" data-render="real" aria-pressed="true">実景</button>
+    </div>
+  </div>
+</header>
+
+<div id="hint" role="status"></div>
+
+<div id="ui" data-open="sun">
+  <section id="sheet" aria-label="操作パネル">
+
+    <div class="panel" data-panel="sun">
+      <div class="ctl">
+        <div class="ctl-head"><label for="alt">太陽高度</label><output id="alt-val" for="alt">33.8°</output></div>
+        <div class="ctl-row">
+          <button class="step" data-step="alt:-0.5" aria-label="高度を下げる">−</button>
+          <input type="range" id="alt" min="-5" max="80" step="0.1" value="33.8">
+          <button class="step" data-step="alt:0.5" aria-label="高度を上げる">+</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <div class="ctl-head"><label for="az">太陽方位</label><output id="az-val" for="az">193.5°</output></div>
+        <div class="ctl-row">
+          <button class="step" data-step="az:-1" aria-label="方位を左へ">−</button>
+          <input type="range" id="az" min="0" max="359.5" step="0.5" value="193.5">
+          <button class="step" data-step="az:1" aria-label="方位を右へ">+</button>
+        </div>
+      </div>
+      <button class="wide" id="restore" type="button">撮影時の太陽に戻す</button>
+    </div>
+
+    <div class="panel" data-panel="view">
+      <div class="grid4">
+        <button class="opt vbtn" data-view="sun" aria-pressed="false">太陽方向</button>
+        <button class="opt vbtn" data-view="up" aria-pressed="false">見上げる</button>
+        <button class="opt vbtn" data-view="anti" aria-pressed="false">太陽の反対</button>
+        <button class="opt vbtn" data-view="all" aria-pressed="false">全天</button>
+      </div>
+      <div class="ctl gap">
+        <div class="ctl-head"><label for="fov">視野の広さ</label><output id="fov-val" for="fov">80°</output></div>
+        <input type="range" id="fov" min="20" max="120" step="1" value="80">
+      </div>
+      <h3>投影</h3>
+      <div class="grid2">
+        <button class="opt pbtn" data-proj="persp" aria-pressed="true">透視（肉眼の見え方）</button>
+        <button class="opt pbtn" data-proj="fish" aria-pressed="false">魚眼（空全体）</button>
+      </div>
+      <p class="note">魚眼は立体射影です。天頂を中心にすると、向日やウェゲナーアークまで空全体が一画面に収まります。</p>
+    </div>
+
+    <div class="panel" data-panel="phen">
+      <div class="chips-head">
+        <button id="all-on" type="button">すべて表示</button>
+        <button id="all-def" type="button">最初の状態</button>
+        <button id="all-off" type="button">すべて隠す</button>
+      </div>
+      <div class="chips" id="chips"></div>
+      <p class="note">弧の位置は、氷晶の面ごとの屈折と反射を光線追跡して求めています。「今は出ない」は、いまの太陽高度では現れない現象です。</p>
+    </div>
+
+    <div class="panel" data-panel="disp">
+      <div class="grid2">
+        <button class="opt mbtn" data-render="diagram" aria-pressed="false">図解（色分け）</button>
+        <button class="opt mbtn" data-render="real" aria-pressed="true">実景（空と光の色）</button>
+      </div>
+      <div class="real-only">
+        <div class="ctl gap">
+          <div class="ctl-head"><label for="veil">氷晶雲の濃さ <span class="unit">光学的厚さ τ</span></label><output id="veil-val" for="veil">0.05</output></div>
+          <input type="range" id="veil" min="0" max="100" step="1" value="50">
+        </div>
+        <div class="ctl">
+          <div class="ctl-head"><label for="ev">明るさ</label><output id="ev-val" for="ev">±0</output></div>
+          <input type="range" id="ev" min="-2" max="2" step="0.1" value="0">
+        </div>
+        <p class="note">ハロは氷晶雲（巻層雲）があるときだけ現れます。弧は端へ行くほど暗くなり、背景の空と雲に対して明るさの差が数%を下回ると、雲のむらに紛れて見えなくなります。雲が薄いほど弧は短く、濃すぎると空全体が白くなって暈も薄れます。既定値 0.05 は撮影時の動画に合わせたものです。</p>
+      </div>
+      <h3>線と目盛り</h3>
+      <div class="grid2">
+        <button class="opt tog" data-ref="horizon" aria-pressed="true">地平線</button>
+        <button class="opt tog" data-ref="cardinal" aria-pressed="true">東西南北</button>
+        <button class="opt tog" data-ref="grid" aria-pressed="false">高度・方位の線</button>
+        <button class="opt tog" data-ref="stars" aria-pressed="false">星</button>
+      </div>
+      <h3>線の太さ</h3>
+      <div class="grid3">
+        <button class="opt wbtn" data-w="0.8" aria-pressed="false">細い</button>
+        <button class="opt wbtn" data-w="1.3" aria-pressed="true">標準</button>
+        <button class="opt wbtn" data-w="2.2" aria-pressed="false">太い</button>
+      </div>
+    </div>
+  </section>
+
+  <nav id="dock" role="tablist" aria-label="パネル切り替え">
+    <button class="tab" data-tab="sun" role="tab" aria-selected="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
+      <span>太陽</span>
+    </button>
+    <button class="tab" data-tab="view" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg>
+      <span>視点</span>
+    </button>
+    <button class="tab" data-tab="phen" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="6.5"/><path d="M1.5 12H5M19 12h3.5"/></svg>
+      <span>現象</span>
+    </button>
+    <button class="tab" data-tab="disp" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 20.5 8 12 12.5 3.5 8z"/><path d="M3.5 12 12 16.5 20.5 12"/><path d="M3.5 16 12 20.5 20.5 16"/></svg>
+      <span>表示</span>
+    </button>
+  </nav>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════
+//   Halo Atlas — geometric halo simulator (mobile-first)
+//   World frame: y up, +x east, +z south. Azimuth from N, clockwise.
+// ═══════════════════════════════════════════════════════════
+
+const DEG = Math.PI / 180, RAD = 180 / Math.PI;
+const R = 100;              // celestial sphere radius
+const N_ICE = 1.31;         // refractive index of ice (mean visible)
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const smoothstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+
+// ─── Light: spectrum, ice dispersion, atmospheric transmittance ──
+// 10 wavelengths; CIE 1931 (Wyman–Sloan–Shirley fit) → linear sRGB, normalised to white.
+const LAMBDAS = Array.from({ length: 10 }, (_, i) => 405 + i * 32.5);
+const LAM_RGB = (() => {
+  const g = (x, mu, s1, s2) => { const t = (x - mu) / (x < mu ? s1 : s2); return Math.exp(-0.5 * t * t); };
+  const raw = LAMBDAS.map(l => {
+    const X = 1.056 * g(l, 599.8, 37.9, 31.0) + 0.362 * g(l, 442.0, 16.0, 26.7) - 0.065 * g(l, 501.1, 20.4, 26.2);
+    const Y = 0.821 * g(l, 568.8, 46.9, 40.5) + 0.286 * g(l, 530.9, 16.3, 31.1);
+    const Z = 1.217 * g(l, 437.0, 11.8, 36.0) + 0.681 * g(l, 459.0, 26.0, 13.8);
+    return [3.2406 * X - 1.5372 * Y - 0.4986 * Z, -0.9689 * X + 1.8758 * Y + 0.0415 * Z, 0.0557 * X - 0.2040 * Y + 1.0570 * Z];
+  });
+  const sum = raw.reduce((a, c) => [a[0] + c[0], a[1] + c[1], a[2] + c[2]], [0, 0, 0]);
+  return raw.map(c => new THREE.Vector3(c[0] / sum[0], c[1] / sum[1], c[2] / sum[2]));
+})();
+const nIce = (l) => 1.3012 + 0.00259 / ((l / 1000) ** 2);    // Cauchy fit: n(656 nm)=1.3072, n(405 nm)=1.3170
+const D60 = (n) => 2 * Math.asin(n / 2) * RAD - 60;
+const D90 = (n) => { const a = n * Math.SQRT1_2; return a >= 1 ? NaN : 2 * Math.asin(a) * RAD - 90; };
+const czaAltOf = (n, h) => { const v = n * n - Math.cos(h * DEG) ** 2; return v > 1 || v < 0 ? NaN : Math.asin(Math.sqrt(v)) * RAD; };
+const sundogAzOf = (n, h) => {
+  const nb = Math.sqrt(n * n - Math.sin(h * DEG) ** 2) / Math.cos(h * DEG);
+  return nb / 2 >= 1 ? NaN : 2 * Math.asin(nb / 2) * RAD - 60;
+};
+// Angular shift of each wavelength relative to the drawn (n = 1.31) curve; + = away from the sun.
+function dispersionShifts(kind, h) {
+  let f = null, scale = 1;
+  if (kind === '60') f = D60;
+  else if (kind === '90') f = D90;
+  else if (kind === 'cza') f = (n) => czaAltOf(n, h);
+  else if (kind === 'parhelia') { f = (n) => sundogAzOf(n, h); scale = Math.cos(h * DEG); }
+  const ref = f ? f(N_ICE) : 0;
+  const shift = [], amp = [];
+  LAMBDAS.forEach(l => {
+    const v = f ? (f(nIce(l)) - ref) * scale : 0;
+    const ok = Number.isFinite(v);
+    shift.push(ok ? v : 0); amp.push(ok ? 1 : 0);
+  });
+  return { shift, amp };
+}
+// Sun transmittance through a Rayleigh + Mie + ozone atmosphere (km), from altitude altKm.
+function sunTransmittance(altKm, dir) {
+  const RE = 6360, RA = 6460, y0 = RE + altKm;
+  const b = y0 * dir.y;
+  const dg = b * b - (y0 * y0 - RE * RE);
+  if (dg > 0 && -b - Math.sqrt(dg) > 0) return new THREE.Vector3(0, 0, 0);
+  const L = -b + Math.sqrt(b * b - (y0 * y0 - RA * RA));
+  let r = 0, m = 0, o = 0;
+  const N = 96;
+  for (let i = 0; i < N; i++) {
+    const s0 = i / N, s1 = (i + 1) / N, sm = (s0 + s1) / 2, t = L * sm * sm, dt = L * (s1 * s1 - s0 * s0);
+    const hk = Math.hypot(dir.x * t, y0 + dir.y * t, dir.z * t) - RE;
+    r += Math.exp(-hk / 8) * dt; m += Math.exp(-hk / 1.2) * dt; o += Math.max(0, 1 - Math.abs(hk - 25) / 15) * dt;
+  }
+  const BR = [5.802e-3, 13.558e-3, 33.1e-3], BO = [0.650e-3, 1.881e-3, 0.085e-3];
+  return new THREE.Vector3(...[0, 1, 2].map(k => Math.exp(-(BR[k] * r + 4.40e-3 * m + BO[k] * o))));
+}
+const SUN_E = 20;
+// Cloud slider (0–1) → optical depth τ of the ice-crystal layer (vertical).
+// Logarithmic: 0.25 → 0.009, 0.5 → 0.05 (thin cirrostratus of the recording), 0.75 → 0.27, 1 → 1.5.
+const veilTau = (v) => (v <= 0 ? 0 : 0.05 * Math.pow(30, 2 * v - 1));            // solar irradiance (arbitrary units shared by sky and halos)
+const EXPOSURE_BASE = 1.0;
+
+const altAzToVec = (altDeg, azDeg, r = 1) => {
+  const a = altDeg * DEG, z = azDeg * DEG;
+  return new THREE.Vector3(Math.cos(a) * Math.sin(z), Math.sin(a), -Math.cos(a) * Math.cos(z)).multiplyScalar(r);
+};
+const vecToAltAz = (v) => {
+  const n = v.clone().normalize();
+  return { alt: Math.asin(clamp(n.y, -1, 1)) * RAD, az: (Math.atan2(n.x, -n.z) * RAD + 360) % 360 };
+};
+
+// ─── Halo geometry ─────────────────────────────────────────
+
+function smallCircleAround(centerDir, radiusDeg, n = 256) {
+  const r = radiusDeg * DEG;
+  const c = centerDir.clone().normalize();
+  const tmp = Math.abs(c.y) < 0.95 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0);
+  const e1 = new THREE.Vector3().crossVectors(tmp, c).normalize();
+  const e2 = new THREE.Vector3().crossVectors(c, e1).normalize();
+  const pts = [];
+  for (let i = 0; i <= n; i++) {
+    const t = (i / n) * Math.PI * 2;
+    pts.push(new THREE.Vector3()
+      .addScaledVector(c, Math.cos(r))
+      .addScaledVector(e1, Math.sin(r) * Math.cos(t))
+      .addScaledVector(e2, Math.sin(r) * Math.sin(t))
+      .multiplyScalar(R));
+  }
+  return pts;
+}
+
+// Upper / lower tangent arcs — horizontal columns, 60° prism, with Bravais' correction for
+// skew rays. The c-axis C sweeps the horizon (α measured from the direction 90° left of the
+// sun's azimuth). The component of S along C is preserved; the component ⊥ C is rotated by the
+// minimum deviation for the effective index n' = √(n² − s²)/√(1 − s²), s = S·C.
+// n'/2 ≥ 1 means total internal reflection: no arc there. That opens gaps below h ≈ 29.2°,
+// separating the upper and lower arcs; above it they join into the circumscribed halo.
+// Verified against a Monte Carlo ray trace of hexagonal columns (edge within ~0.1°).
+// Wegener arcs (wegener = true): the same 60° rays, reflected once inside by an end face. That
+// reflection flips only the component along C, so each tangent-arc caustic point is mirrored in
+// the plane ⊥ C:  R_W = R_T − 2(S·C)C. Verified against a Monte Carlo ray trace (edge within
+// 0.1–0.2°). The arcs cross at the anthelion once the sun is above ≈ 15°.
+function tangentArcBranches(sunDir, n = 720, wegener = false) {
+  const S = sunDir.clone().normalize();
+  const uh = new THREE.Vector3(S.x, 0, S.z);
+  if (uh.lengthSq() < 1e-10) uh.set(0, 0, 1);
+  uh.normalize();
+  const eh = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), uh);
+  const point = (a) => {
+    const C = eh.clone().multiplyScalar(Math.cos(a)).addScaledVector(uh, Math.sin(a));
+    const sc = S.dot(C);
+    const nb = Math.sqrt(N_ICE * N_ICE - sc * sc) / Math.sqrt(Math.max(1e-9, 1 - sc * sc));
+    if (nb / 2 >= 1) return null;
+    const dl = 2 * Math.asin(nb / 2) - 60 * DEG;
+    const par = C.clone().multiplyScalar(sc);
+    const perp = S.clone().sub(par);
+    const cross = new THREE.Vector3().crossVectors(C, perp);
+    const v = par.addScaledVector(perp, Math.cos(dl)).addScaledVector(cross, Math.sin(dl)).normalize();
+    const as = Math.abs(sc);
+    if (!wegener) {
+      // brightness along the arc, fitted to a ray trace with 1° crystal wobble (h = 20–45°)
+      v.w = (1 / (1 + Math.pow(as / 0.38, 3))) * (1 - smoothstep(0.55, 0.88, as));
+      return v.multiplyScalar(R);
+    }
+    v.addScaledVector(C, -2 * sc);
+    // bright side of the fold: the direction of increasing deviation, i.e. rotation about C
+    // (C × R). It has no component along C, so the end-face mirror leaves it unchanged.
+    v.tail = new THREE.Vector3().crossVectors(C, v).normalize();
+    // brightness fitted to a ray trace with 1° wobble: rays near ⊥ C rarely reach an end face;
+    // near the total-internal-reflection limit of the 60° path they fade out
+    v.w = Math.pow(Math.min(1, as / 0.4), 0.6) * (1 - smoothstep(0.60, 0.92, as));
+    return v.multiplyScalar(R);
+  };
+  // Sample α uniformly, then bisect where neighbouring points are far apart or where the arc
+  // ends at the total-internal-reflection limit (the arc moves quickly there).
+  const refine = (A, B, out, depth) => {
+    if (depth > 16) return;
+    if (A.v && B.v) { if (depth > 8 || A.v.angleTo(B.v) < 0.5 * DEG) return; }
+    else if (!A.v && !B.v) return;
+    const M = { a: 0.5 * (A.a + B.a) };
+    M.v = point(M.a);
+    refine(A, M, out, depth + 1); out.push(M); refine(M, B, out, depth + 1);
+  };
+  const branch = (a0, a1) => {
+    const m = n / 2, samples = [];
+    let prev = { a: a0, v: point(a0) };
+    samples.push(prev);
+    for (let i = 1; i <= m; i++) {
+      const cur = { a: a0 + (a1 - a0) * (i / m) };
+      cur.v = point(cur.a);
+      refine(prev, cur, samples, 0);
+      samples.push(cur);
+      prev = cur;
+    }
+    const segs = [];
+    let line = [], startsAtJoin = false;
+    samples.forEach((smp, i) => {
+      if (smp.v) { if (!line.length) startsAtJoin = (i === 0); line.push(smp.v); }
+      else if (line.length) { line.taper = [!startsAtJoin, true]; segs.push(line); line = []; }
+    });
+    if (line.length) { line.taper = [!startsAtJoin, false]; segs.push(line); }
+    return segs.filter(g => g.length >= 2);
+  };
+  return { lower: branch(-Math.PI / 2, Math.PI / 2), upper: branch(Math.PI / 2, 1.5 * Math.PI) };
+}
+
+// ─── Oriented-crystal ray tracing (plain numbers, no allocation in the loops) ──
+function fresnelT(ci, ct, n1, n2) {
+  const rs = (n1 * ci - n2 * ct) / (n1 * ci + n2 * ct);
+  const rp = (n1 * ct - n2 * ci) / (n1 * ct + n2 * ci);
+  return 1 - 0.5 * (rs * rs + rp * rp);
+}
+// Light travelling along d enters face nIn and leaves face nOut (outward unit normals).
+// Writes the apparent direction of the light (−exit ray) and a throughput weight into out.
+function traceNum(dx, dy, dz, ix, iy, iz, ox, oy, oz, out) {
+  const c1 = -(dx * ix + dy * iy + dz * iz);
+  if (c1 <= 0) return false;                                   // face not lit
+  // (out is any indexable array; a Float64Array keeps the hot loops monomorphic)
+  let eta = 1 / N_ICE, k = 1 - eta * eta * (1 - c1 * c1);
+  const ct1 = Math.sqrt(k);
+  let f = eta * c1 - ct1;
+  const x = eta * dx + f * ix, y = eta * dy + f * iy, z = eta * dz + f * iz;
+  const c2 = x * ox + y * oy + z * oz;
+  if (c2 <= 0) return false;                                   // not heading for the exit face
+  eta = N_ICE; k = 1 - eta * eta * (1 - c2 * c2);
+  if (k <= 0) return false;                                    // total internal reflection
+  const ct2 = Math.sqrt(k);
+  f = eta * c2 - ct2;
+  out[0] = -(eta * x - f * ox); out[1] = -(eta * y - f * oy); out[2] = -(eta * z - f * oz);
+  out[3] = c1 * fresnelT(c1, ct1, 1, N_ICE) * fresnelT(c2, ct2, N_ICE, 1);
+  return true;
+}
+// Horizontal c-axis at angle a from ê (90° left of the sun's azimuth) toward û (the sun's azimuth).
+function horizontalFrame(sunDir) {
+  const uh = new THREE.Vector3(sunDir.x, 0, sunDir.z);
+  if (uh.lengthSq() < 1e-10) uh.set(0, 0, 1);
+  uh.normalize();
+  const eh = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), uh);
+  return { eh, uh };
+}
+
+// Parry arcs — columns with the c-axis horizontal AND a pair of prism faces horizontal.
+// Only the c-axis azimuth is free, so each 60° face pair traces one exact arc.
+// Face angle θ is measured around the c-axis from horizontal toward vertical (90° = top face).
+const PARRY_PAIRS = {
+  upperSuncave: [90, 210],     // top face → lower oblique face
+  upperSunvex:  [150, 30],     // upper oblique → upper oblique (low sun only)
+  lowerSunvex:  [210, 330],    // lower oblique → lower oblique
+  lowerSuncave: [150, 270],    // upper oblique → bottom face
+};
+function parryArcs(sunDir, n = 720) {
+  const S = sunDir.clone().normalize();
+  const { eh, uh } = horizontalFrame(S);
+  const o = [0, 0, 0, 0], res = {};
+  for (const [name, [ti, to]] of Object.entries(PARRY_PAIRS)) {
+    const ci = Math.cos(ti * DEG), si = Math.sin(ti * DEG), co = Math.cos(to * DEG), so = Math.sin(to * DEG);
+    const segs = [];
+    let cur = [], firstAtZero = false;
+    for (let i = 0; i <= n; i++) {
+      const a = (i / n) * 2 * Math.PI, ca = Math.cos(a), sa = Math.sin(a);
+      const Cx = ca * eh.x + sa * uh.x, Cz = ca * eh.z + sa * uh.z;
+      const u2x = -Cz, u2z = Cx;                               // C × up (horizontal, ⊥ C)
+      const ok = traceNum(-S.x, -S.y, -S.z,
+        ci * u2x, si, ci * u2z, co * u2x, so, co * u2z, o);
+      if (ok) {
+        if (!cur.length && i === 0) firstAtZero = true;
+        const v = new THREE.Vector3(o[0], o[1], o[2]).normalize().multiplyScalar(R);
+        v.T = o[3];
+        cur.push(v);
+      } else if (cur.length) { segs.push(cur); cur = []; }
+    }
+    if (cur.length) {
+      if (firstAtZero && segs.length) { const first = segs.shift(); cur.pop(); segs.push(cur.concat(first)); }
+      else segs.push(cur);
+    }
+    res[name] = segs.filter(g => g.length >= 2);
+    // Brightness: each c-axis azimuth sends one ray, so the light per unit arc length is
+    // T·dα/ds. Matches a ray trace with 1° wobble; 1.79 is the apex value at h = 34°.
+    const dA = 360 / n;
+    for (const g of res[name]) {
+      for (let i = 0; i < g.length; i++) {
+        const a = g[Math.max(0, i - 1)], b = g[Math.min(g.length - 1, i + 1)];
+        const ds = a.angleTo(b) * RAD / (Math.min(g.length - 1, i + 1) - Math.max(0, i - 1));
+        g[i].w = Math.min(1.5, g[i].T / Math.max(ds / dA, 0.02) / 1.79);
+      }
+    }
+  }
+  return res;
+}
+
+// Lateral arcs — horizontal columns rotating freely about the c-axis; 90° prism made by an
+// end (basal) face and a side face. Two free angles (c-axis azimuth a, side-face angle f), so
+// the arcs are fold caustics of (a, f) → sky: the zero set of g = (R_a × R_f)·R, extracted with
+// marching squares on a periodic grid. Verified against a Monte Carlo ray trace: the arcs
+// touch the 46° halo (45.73°) and the supralateral apex sits exactly on the CZA altitude.
+// kind 'supra': side face → end face (arch above the sun; only for h < 32.2°)
+// kind 'infra': end face → side face (arcs beside and below the sun)
+function lateralArcs(sunDir, kind, NA = 300, NF = 200) {
+  const S = sunDir.clone().normalize();
+  const { eh, uh } = horizontalFrame(S);
+  const ex = eh.x, ez = eh.z, ux = uh.x, uz = uh.z;
+  const dx = -S.x, dy = -S.y, dz = -S.z;
+  const supra = kind === 'supra';
+  const N = NA * NF, Rg = new Float32Array(N * 3), ok = new Uint8Array(N), o = new Float64Array(4);
+  const CF = new Float64Array(NF), SF = new Float64Array(NF);
+  for (let j = 0; j < NF; j++) { CF[j] = Math.cos(2 * Math.PI * j / NF); SF[j] = Math.sin(2 * Math.PI * j / NF); }
+  for (let i = 0; i < NA; i++) {
+    const A = 2 * Math.PI * i / NA, ca = Math.cos(A), sa = Math.sin(A);
+    const Cx = ca * ex + sa * ux, Cz = ca * ez + sa * uz;
+    for (let j = 0; j < NF; j++) {
+      const nx = -Cz * CF[j], ny = SF[j], nz = Cx * CF[j];
+      const hit = supra ? traceNum(dx, dy, dz, nx, ny, nz, Cx, 0, Cz, o) : traceNum(dx, dy, dz, Cx, 0, Cz, nx, ny, nz, o);
+      if (hit) { const id = i * NF + j; ok[id] = 1; Rg[3 * id] = o[0]; Rg[3 * id + 1] = o[1]; Rg[3 * id + 2] = o[2]; }
+    }
+  }
+  const rayAt = (a, f) => {
+    const A = 2 * Math.PI * a / NA, F = 2 * Math.PI * f / NF, ca = Math.cos(A), sa = Math.sin(A);
+    const Cx = ca * ex + sa * ux, Cz = ca * ez + sa * uz, cf = Math.cos(F);
+    const nx = -Cz * cf, ny = Math.sin(F), nz = Cx * cf;
+    return supra ? traceNum(dx, dy, dz, nx, ny, nz, Cx, 0, Cz, o) : traceNum(dx, dy, dz, Cx, 0, Cz, nx, ny, nz, o);
+  };
+  const G = new Float32Array(N);
+  for (let i = 0; i < NA; i++) {
+    const ip = ((i + 1) % NA) * NF, im = ((i - 1 + NA) % NA) * NF, ic = i * NF;
+    for (let j = 0; j < NF; j++) {
+      const jp = j + 1 === NF ? 0 : j + 1, jm = j === 0 ? NF - 1 : j - 1;
+      const c = ic + j, a1 = ip + j, a0 = im + j, f1 = ic + jp, f0 = ic + jm;
+      if (!(ok[c] & ok[a1] & ok[a0] & ok[f1] & ok[f0])) { G[c] = NaN; continue; }
+      const ax = Rg[3 * a1] - Rg[3 * a0], ay = Rg[3 * a1 + 1] - Rg[3 * a0 + 1], az = Rg[3 * a1 + 2] - Rg[3 * a0 + 2];
+      const fx = Rg[3 * f1] - Rg[3 * f0], fy = Rg[3 * f1 + 1] - Rg[3 * f0 + 1], fz = Rg[3 * f1 + 2] - Rg[3 * f0 + 2];
+      G[c] = (ay * fz - az * fy) * Rg[3 * c] + (az * fx - ax * fz) * Rg[3 * c + 1] + (ax * fy - ay * fx) * Rg[3 * c + 2];
+    }
+  }
+  // Marching squares. Crossing points are keyed by grid edge: 2·id for the a-edge, 2·id+1 for the f-edge.
+  const PAIRS = [null, [0, 3], [0, 1], [1, 3], [1, 2], [0, 1, 2, 3], [0, 2], [2, 3],
+                 [2, 3], [0, 2], [0, 3, 1, 2], [1, 2], [1, 3], [0, 1], [0, 3], null];
+  const pts = new Map(), adj = new Map();
+  const point = (key, a, f) => {
+    if (pts.has(key)) return pts.get(key);
+    let v = null;
+    if (rayAt(a, f)) { v = new THREE.Vector3(o[0], o[1], o[2]).normalize().multiplyScalar(R); v.w = Math.min(1, o[3] / 0.5); }
+    pts.set(key, v);
+    return v;
+  };
+  const link = (k1, k2) => {
+    (adj.get(k1) || adj.set(k1, []).get(k1)).push(k2);
+    (adj.get(k2) || adj.set(k2, []).get(k2)).push(k1);
+  };
+  const ek = [0, 0, 0, 0], ea = [0, 0, 0, 0], ef = [0, 0, 0, 0];
+  for (let i = 0; i < NA; i++) {
+    const i1 = i + 1 === NA ? 0 : i + 1;
+    for (let j = 0; j < NF; j++) {
+      const j1 = j + 1 === NF ? 0 : j + 1;
+      const g00 = G[i * NF + j], g10 = G[i1 * NF + j], g11 = G[i1 * NF + j1], g01 = G[i * NF + j1];
+      if (!(g00 === g00 && g10 === g10 && g11 === g11 && g01 === g01)) continue;
+      const c = (g00 > 0 ? 1 : 0) | (g10 > 0 ? 2 : 0) | (g11 > 0 ? 4 : 0) | (g01 > 0 ? 8 : 0);
+      const pr = PAIRS[c];
+      if (!pr) continue;
+      ek[0] = 2 * (i * NF + j);      ea[0] = i + g00 / (g00 - g10); ef[0] = j;
+      ek[1] = 2 * (i1 * NF + j) + 1; ea[1] = i + 1;                 ef[1] = j + g10 / (g10 - g11);
+      ek[2] = 2 * (i * NF + j1);     ea[2] = i + g01 / (g01 - g11); ef[2] = j + 1;
+      ek[3] = 2 * (i * NF + j) + 1;  ea[3] = i;                     ef[3] = j + g00 / (g00 - g01);
+      for (let q = 0; q < pr.length; q += 2) {
+        const e1 = pr[q], e2 = pr[q + 1];
+        if (point(ek[e1], ea[e1], ef[e1]) && point(ek[e2], ea[e2], ef[e2])) link(ek[e1], ek[e2]);
+      }
+    }
+  }
+  // Chain segments into polylines: open chains first, then closed loops.
+  const seen = new Set(), lines = [];
+  const walk = (start) => {
+    const line = [pts.get(start)];
+    seen.add(start);
+    let prev = -1, cur = start;
+    for (;;) {
+      const nb = adj.get(cur).find(k => k !== prev && !seen.has(k));
+      if (nb === undefined) break;
+      line.push(pts.get(nb)); seen.add(nb); prev = cur; cur = nb;
+    }
+    return line;
+  };
+  for (const [k, nb] of adj) if (nb.length === 1 && !seen.has(k)) lines.push(walk(k));
+  for (const [k] of adj) if (!seen.has(k)) { const l = walk(k); l.push(l[0]); lines.push(l); }
+  return lines.filter(l => l.length >= 6);
+}
+
+// Oriented-crystal arcs depend only on the sun's altitude (the pattern turns with its azimuth),
+// so compute them for azimuth 180° once per altitude and rotate copies into place.
+const arcCache = new Map();
+function cachedArcs(key, sunDir, fn) {
+  const { alt, az } = vecToAltAz(sunDir);
+  const ck = key + ':' + alt.toFixed(3);
+  let base = arcCache.get(ck);
+  if (!base) {
+    base = fn(altAzToVec(alt, 180));
+    arcCache.set(ck, base);
+    if (arcCache.size > 240) arcCache.delete(arcCache.keys().next().value);
+  }
+  const d = (az - 180) * DEG, c = Math.cos(d), s = Math.sin(d);
+  const copy = (v) => { const u = new THREE.Vector3(v.x * c - v.z * s, v.y, v.x * s + v.z * c); u.w = v.w; return u; };
+  const rot = (x) => Array.isArray(x) ? Object.assign(x.map(rot), x.taper ? { taper: x.taper } : {}) : copy(x);
+  return Array.isArray(base) ? rot(base) : Object.fromEntries(Object.entries(base).map(([k, v]) => [k, rot(v)]));
+}
+
+// Sundogs — Bravais effective index for inclined rays through a 60° prism.
+function sundogPoints(sunDir) {
+  const { alt, az } = vecToAltAz(sunDir);
+  const h = alt * DEG;
+  const nB = Math.sqrt(N_ICE * N_ICE - Math.sin(h) ** 2) / Math.cos(h);
+  const arg = nB * 0.5;                                       // sin(60°/2)
+  if (arg >= 0.9999) return [];                               // above ~60.75°
+  const dAz = (2 * Math.asin(arg) * RAD) - 60;
+  return [altAzToVec(alt, az - dAz, R), altAzToVec(alt, az + dAz, R)];
+}
+
+// Circumzenithal arc — exact. Plate crystals (c-axis vertical): light enters the
+// top face and leaves a vertical side face. The vertical ray component is fixed,
+// so the arc lies at constant altitude e with  sin e = √(n² − cos²h).
+// Side-face azimuth φ (relative to the refracted ray) is limited by total internal
+// reflection: cos φ ≥ √(n² − 1) / cos h. Exists only for 0 < h < 32.2°.
+function czaCurve(sunDir, n = 160) {
+  const { alt: h, az } = vecToAltAz(sunDir);
+  if (h <= 0) return [];
+  const ch = Math.cos(h * DEG);
+  const k = Math.sqrt(N_ICE * N_ICE - 1) / ch;
+  if (k >= 1) return [];
+  const e = Math.asin(Math.sqrt(N_ICE * N_ICE - ch * ch)) * RAD;
+  const phiMax = Math.acos(k);
+  const pts = [];
+  for (let i = 0; i <= n; i++) {
+    const phi = -phiMax + 2 * phiMax * (i / n);
+    const c = Math.cos(phi), s = Math.sin(phi);
+    const q = Math.sqrt(Math.max(0, 1 - N_ICE * N_ICE + ch * ch * c * c));
+    const dAz = Math.atan2(s * (ch * c - q), ch * s * s + q * c) * RAD;
+    pts.push(altAzToVec(e, az + dAz, R));
+  }
+  return [pts];
+}
+
+// ─── Phenomena registry ────────────────────────────────────
+
+const PHENOMENA = [
+  { id: 'h22', jp: '22°ハロ|（内暈）', en: '22° halo', color: 0xe8eeff, def: true, kind: 'line', opacity: 0.9,
+    compute: (sd) => [smallCircleAround(sd, 21.84)] },
+  { id: 'h46', jp: '46°ハロ|（外暈）', en: '46° halo', color: 0xa8b8d8, def: true, kind: 'line', opacity: 0.5,
+    compute: (sd) => [smallCircleAround(sd, 45.75)] },
+  { id: 'parhelic', jp: '幻日環', en: 'Parhelic circle', color: 0xfff5e0, def: true, kind: 'line', opacity: 0.75,
+    compute: (sd) => { const h = vecToAltAz(sd).alt; return Math.abs(h) < 89.5 ? [smallCircleAround(new THREE.Vector3(0, 1, 0), 90 - h)] : []; } },
+  { id: 'sundogs', jp: '幻日', en: 'Sundogs', color: 0xff9a5a, def: true, kind: 'points', size: 4.2,
+    compute: sundogPoints },
+  { id: 'utangent', jp: '上端|タンジェントアーク', en: 'Upper tangent arc', color: 0xffe39a, def: true, kind: 'line', opacity: 0.9,
+    compute: (sd) => tangentArcBranches(sd).upper },
+  { id: 'ltangent', jp: '下端|タンジェントアーク', en: 'Lower tangent arc', color: 0xffd180, def: true, kind: 'line', opacity: 0.9,
+    compute: (sd) => tangentArcBranches(sd).lower },
+  { id: 'parry', jp: '上部|パリーアーク', en: 'Upper Parry arcs', color: 0xffb070, def: true, kind: 'line', opacity: 0.9,
+    compute: (sd) => { const p = cachedArcs('parry', sd, parryArcs); return [...p.upperSuncave, ...p.upperSunvex]; } },
+  { id: 'parryLower', jp: '下部|パリーアーク', en: 'Lower Parry arcs', color: 0xe8906a, def: false, kind: 'line', opacity: 0.85,
+    compute: (sd) => { const p = cachedArcs('parry', sd, parryArcs); return [...p.lowerSuncave, ...p.lowerSunvex]; } },
+  { id: 'cza', jp: '環天頂アーク', en: 'Circumzenithal arc', color: 0xffffff, def: true, kind: 'line', opacity: 0.95,
+    spectral: 1, minHalfDeg: 1.1, compute: czaCurve },
+  { id: 'supralateral', jp: '上方|ラテラルアーク', en: 'Supralateral arc', color: 0x9ad4ff, def: true, kind: 'line', opacity: 0.8,
+    compute: (sd) => cachedArcs('supra', sd, (v) => lateralArcs(v, 'supra')) },
+  { id: 'infralateral', jp: '下方|ラテラルアーク', en: 'Infralateral arcs', color: 0x7ec4f0, def: true, kind: 'line', opacity: 0.8,
+    compute: (sd) => cachedArcs('infra', sd, (v) => lateralArcs(v, 'infra')) },
+  { id: 'wegener', jp: 'ウェゲナーアーク', en: 'Wegener arcs', color: 0xc89eff, def: true, kind: 'line', opacity: 0.7,
+    compute: (sd) => { const b = tangentArcBranches(sd, 720, true); return [...b.upper, ...b.lower]; } },
+  { id: 'anthelion', jp: '向日', en: 'Anthelion', color: 0xffb285, def: true, kind: 'points', size: 4,
+    compute: (sd) => { const { alt, az } = vecToAltAz(sd); return [altAzToVec(alt, az + 180, R)]; } },
+  { id: 'subsun', jp: '映日', en: 'Subsun', color: 0xffe0a0, def: false, kind: 'points', size: 4,
+    compute: (sd) => { const { alt, az } = vecToAltAz(sd); return alt > 0 ? [altAzToVec(-alt, az, R)] : []; } },
+  { id: 'p120', jp: '120°幻日', en: '120° parhelia', color: 0xcfd6e6, def: false, kind: 'points', size: 3.6,
+    compute: (sd) => { const { alt, az } = vecToAltAz(sd); return [altAzToVec(alt, az - 120, R), altAzToVec(alt, az + 120, R)]; } },
+];
+PHENOMENA.forEach(p => { p.on = p.def; p.present = true; });
+
+// Realistic look. k sets each halo's brightness: the peak contrast against the sky + cloud
+// behind it is about 0.35 for the 22° halo, 0.8 for the upper tangent arc, 0.5 for the Parry arc,
+// 3 for the parhelia, 0.2 for the parhelic circle and 0.1 for the Wegener arcs at τ = 0.05 and
+// h = 34° (1.2 for the CZA at h = 22°). With these values the simulator matches the video of
+// 2016-10-25 (upper tangent arc visible to ~20° either side of its apex, circumscribed sides not).
+// disp: dispersion geometry. sigma: inner-edge blur (sun disc + crystal
+// imperfection, deg). t1/t2/mix: outward tail. sym: symmetric white band. k: brightness.
+const REAL = {
+  h22:          { disp: '60', sigma: 0.32, t1: 0.55, t2: 3.0, mix: 0.6, k: 0.147 },
+  h46:          { disp: '90', sigma: 0.45, t1: 1.1, t2: 3.5, mix: 0.5, k: 0.019 },
+  parhelic:     { sym: true, sigma: 0.35, k: 0.032 },
+  sundogs:      { disp: 'parhelia', along: true, sigma: 0.28, sigmaV: 0.6, t1: 0.7, t2: 3.5, mix: 0.7, k: 0.98 },
+  utangent:     { disp: '60', sigma: 0.3, t1: 0.45, t2: 2.2, mix: 0.6, k: 0.34 },
+  ltangent:     { disp: '60', sigma: 0.3, t1: 0.45, t2: 2.2, mix: 0.6, k: 0.22 },
+  parry:        { disp: '60', sigma: 0.25, t1: 0.35, t2: 0.9, mix: 0.8, k: 0.22 },
+  parryLower:   { disp: '60', sigma: 0.25, t1: 0.35, t2: 0.9, mix: 0.8, k: 0.146 },
+  cza:          { disp: 'cza', sym: true, sigma: 0.24, k: 0.36 },
+  supralateral: { disp: '90', sigma: 0.45, t1: 1.0, t2: 3.0, mix: 0.5, k: 0.04 },
+  infralateral: { disp: '90', sigma: 0.45, t1: 1.0, t2: 3.0, mix: 0.5, k: 0.032 },
+  wegener:      { disp: '60', orient: 'tail', sigma: 0.3, t1: 0.5, t2: 2.0, mix: 0.6, k: 0.018 },
+  anthelion:    { spot: true, size: 3.2, k: 0.034 },
+  subsun:       { spot: true, size: 2.2, k: 0.58 },
+  p120:         { spot: true, size: 2.4, k: 0.016 },
+};
+
+// ─── State ─────────────────────────────────────────────────
+
+const SHOT = { alt: 33.8, az: 193.5 };      // 2016-10-25 12:00:19 JST, 43.02°N 142.40°E
+const FOV_RANGE = { persp: [20, 120], fish: [60, 230] };
+const state = {
+  sunAlt: SHOT.alt, sunAz: SHOT.az,
+  yaw: 180, pitch: 38, fov: 80, proj: 'persp',
+  lineMul: 1.3,
+  render: 'real', veil: 0.5, ev: 0,
+  ref: { horizon: true, cardinal: true, grid: false, stars: false },
+};
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const landscapeMQ = window.matchMedia('(orientation: landscape)');
+
+// ─── Renderer & scene ──────────────────────────────────────
+
+const canvas = document.getElementById('sky');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setClearColor(0x070a14, 1);
+const scene = new THREE.Scene();
+
+// HDR buffers for the realistic mode (half float where renderable, else 8-bit with headroom).
+const HDR = (() => {
+  const gl = renderer.getContext();
+  const ok = renderer.capabilities.isWebGL2
+    ? !!(gl.getExtension('EXT_color_buffer_float') || gl.getExtension('EXT_color_buffer_half_float'))
+    : !!(gl.getExtension('OES_texture_half_float') && gl.getExtension('EXT_color_buffer_half_float'));
+  return ok ? { type: THREE.HalfFloatType, store: 1 } : { type: THREE.UnsignedByteType, store: 1 / 16 };
+})();
+
+const skyDiagMat = new THREE.ShaderMaterial({
+    side: THREE.BackSide, depthWrite: false,
+    vertexShader: 'varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: `
+      varying vec3 vP;
+      void main(){
+        float h = normalize(vP).y;
+        vec3 zenith  = vec3(0.022, 0.030, 0.060);
+        vec3 mid     = vec3(0.034, 0.046, 0.082);
+        vec3 horizon = vec3(0.058, 0.066, 0.098);
+        vec3 ground  = vec3(0.010, 0.012, 0.018);
+        vec3 c = h > 0.0
+          ? mix(horizon, mix(mid, zenith, smoothstep(0.0, 1.0, h)), smoothstep(0.0, 0.45, h))
+          : mix(horizon, ground, smoothstep(0.0, -0.08, h));
+        gl_FragColor = vec4(c, 1.0);
+      }`
+});
+
+// Single-scattering atmosphere (Rayleigh + Mie + ozone) plus a thin cirrostratus veil,
+// rendered into an equirectangular HDR texture whenever the sun or the veil changes.
+const skyRT = new THREE.WebGLRenderTarget(512, 256, {
+  type: HDR.type, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
+  wrapS: THREE.RepeatWrapping, wrapT: THREE.ClampToEdgeWrapping, depthBuffer: false, generateMipmaps: false,
+});
+const atmoU = {
+  uSun: { value: new THREE.Vector3(0, 1, 0) },
+  uSunE: { value: SUN_E },
+  uTau: { value: 0.3 },
+  uStore: { value: HDR.store },
+};
+const quadGeo = new THREE.PlaneGeometry(2, 2);
+const QUAD_VS = 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }';
+const atmoScene = new THREE.Scene();
+atmoScene.add(new THREE.Mesh(quadGeo, new THREE.ShaderMaterial({
+  uniforms: atmoU, depthTest: false, depthWrite: false, vertexShader: QUAD_VS,
+  fragmentShader: `
+    varying vec2 vUv;
+    uniform vec3 uSun;
+    uniform float uSunE, uTau, uStore;
+    #define PI 3.14159265
+    const float RE = 6360.0;          // km
+    const float RA = 6460.0;
+    const float HOBS = 0.35;          // Shimukappu valley floor, approx.
+    const float HCLOUD = 8.0;         // cirrostratus
+    const vec3 BR = vec3(5.802e-3, 13.558e-3, 33.1e-3);
+    const float BMS = 3.996e-3;
+    const float BME = 4.40e-3;
+    const vec3 BO = vec3(0.650e-3, 1.881e-3, 0.085e-3);
+    const vec3 ALBEDO = vec3(0.015, 0.018, 0.013);
+    vec2 raySphere(vec3 ro, vec3 rd, float r) {
+      float b = dot(ro, rd);
+      float c = dot(ro, ro) - r * r;
+      float d = b * b - c;
+      if (d < 0.0) return vec2(-1e9, -1e9);   // miss: never counts as a hit in front
+      d = sqrt(d);
+      return vec2(-b - d, -b + d);
+    }
+    vec3 dens(vec3 p) {
+      float h = length(p) - RE;
+      return vec3(exp(-h / 8.0), exp(-h / 1.2), max(0.0, 1.0 - abs(h - 25.0) / 15.0));
+    }
+    vec3 ext(vec3 od) { return exp(-(BR * od.x + BME * od.y + BO * od.z)); }
+    vec3 odToSun(vec3 p) {
+      if (raySphere(p, uSun, RE).x > 0.0) return vec3(1e4);          // in the earth's shadow
+      float L = raySphere(p, uSun, RA).y;
+      vec3 od = vec3(0.0);
+      for (int j = 0; j < 8; j++) {
+        float s0 = float(j) / 8.0, s1 = float(j + 1) / 8.0, sm = 0.5 * (s0 + s1);
+        od += dens(p + uSun * (L * sm * sm)) * (L * (s1 * s1 - s0 * s0));
+      }
+      return od;
+    }
+    void main() {
+      float alt = (vUv.y - 0.5) * PI;
+      float az = vUv.x * 2.0 * PI;
+      vec3 d = vec3(cos(alt) * sin(az), sin(alt), -cos(alt) * cos(az));
+      vec3 ro = vec3(0.0, RE + HOBS, 0.0);
+      vec2 tg = raySphere(ro, d, RE);
+      bool ground = tg.x > 0.0;
+      float tMax = ground ? tg.x : raySphere(ro, d, RA).y;
+      vec3 od = vec3(0.0), sR = vec3(0.0), sM = vec3(0.0);
+      for (int i = 0; i < 24; i++) {
+        float s0 = float(i) / 24.0, s1 = float(i + 1) / 24.0, sm = 0.5 * (s0 + s1);
+        vec3 p = ro + d * (tMax * sm * sm);
+        vec3 dn = dens(p) * (tMax * (s1 * s1 - s0 * s0));
+        vec3 T = ext(od + 0.5 * dn + odToSun(p));
+        od += dn;
+        sR += dn.x * T;
+        sM += dn.y * T;
+      }
+      float mu = dot(d, uSun);
+      float g = 0.76;
+      float pR = 3.0 / (16.0 * PI) * (1.0 + mu * mu);
+      float pM = 3.0 / (8.0 * PI) * ((1.0 - g * g) * (1.0 + mu * mu)) / ((2.0 + g * g) * pow(1.0 + g * g - 2.0 * g * mu, 1.5));
+      vec3 L = uSunE * (sR * BR * pR + sM * BMS * pM);
+      if (ground) {
+        vec3 pg = ro + d * tg.x;
+        vec3 Ts = ext(odToSun(pg * (1.0 + 1e-6)));
+        float cz = max(dot(normalize(pg), uSun), 0.0);
+        vec3 E = uSunE * (Ts * cz + vec3(0.05, 0.07, 0.11) * smoothstep(-0.1, 0.3, uSun.y));
+        L += ext(od) * E * ALBEDO / PI;
+      } else if (uTau > 0.0) {
+        float m = max(d.y, 0.12);
+        float tauS = min(uTau / max(d.y, 0.06), 4.0);
+        vec3 pc = ro + d * raySphere(ro, d, RE + HCLOUD).y;
+        vec3 Tc = ext(odToSun(pc));
+        float th = acos(clamp(mu, -1.0, 1.0));
+        float hg = (1.0 - 0.25) / (4.0 * PI * pow(1.25 - 1.0 * mu, 1.5));
+        float sw = 0.025;
+        float P = 0.35 * hg + 0.45 * exp(-th * th / (2.0 * sw * sw)) / (2.0 * PI * sw * sw) + 0.2 / (4.0 * PI);
+        vec3 Tdown = ext(vec3(5.06, 1.2, 0.0) / m);
+        L = L * exp(-0.35 * tauS) + uSunE * Tc * (1.0 - exp(-tauS)) * P * Tdown;
+      }
+      gl_FragColor = vec4(L * uStore, 1.0);
+    }`,
+})));
+
+// Visibility of faint halo light. Halo arcs fade steadily along their length; how far one can be
+// followed depends on its contrast against the sky and the cloud behind it. Thin cirrostratus is
+// never smooth, so light below a few percent of the background is lost in its texture.
+// C_TH is that threshold (contrast = halo peak / background luminance).
+const C_TH = 0.05;
+const visU = { tSky: { value: skyRT.texture }, uCth: { value: C_TH } };
+const VIS_GLSL = `
+  uniform sampler2D tSky;
+  uniform float uCth;
+  const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
+  float visibility(float Lh, vec3 d) {
+    float alt = asin(clamp(d.y, -1.0, 1.0)), az = atan(d.x, -d.z);
+    float Lb = dot(texture2D(tSky, vec2(fract(az / 6.2831853), alt / 3.14159265 + 0.5)).rgb, LUMA);
+    return smoothstep(uCth, 2.0 * uCth, Lh / max(Lb, 1e-6));
+  }`;
+
+const skyRealMat = new THREE.ShaderMaterial({
+  side: THREE.BackSide, depthWrite: false,
+  uniforms: { tSky: { value: skyRT.texture } },
+  vertexShader: 'varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  fragmentShader: `
+    uniform sampler2D tSky;
+    varying vec3 vP;
+    void main() {
+      vec3 d = normalize(vP);
+      float alt = asin(clamp(d.y, -1.0, 1.0));
+      float az = atan(d.x, -d.z);
+      gl_FragColor = vec4(texture2D(tSky, vec2(fract(az / 6.2831853), alt / 3.14159265 + 0.5)).rgb, 1.0);
+    }`,
+});
+
+const skyDome = new THREE.Mesh(new THREE.SphereGeometry(R * 4, 48, 24), state.render === 'real' ? skyRealMat : skyDiagMat);
+skyDome.renderOrder = -1;
+scene.add(skyDome);
+
+// ─── Soft-band ("ribbon") rendering ────────────────────────
+// Each curve becomes a thin band on the sphere. Width is an angle, so a
+// band keeps a consistent look in perspective, fisheye, and cube faces.
+
+const widthU = { value: 0.3 };            // shared half-width (world units)
+const RIBBON_VS = `
+  attribute vec3 sideDir;
+  attribute float side;
+  uniform float uHalfWidth;
+  uniform float uWidthMul;
+  uniform float uMinHalf;
+  varying float vSide;
+  void main() {
+    vSide = side;
+    vec3 p = position + sideDir * side * max(uHalfWidth * uWidthMul, uMinHalf);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+  }`;
+const RIBBON_FS = `
+  uniform vec3 uColor;
+  uniform float uOpacity;
+  uniform float uSpectral;
+  varying float vSide;
+  vec3 spectrum(float t) {
+    t = clamp(t, 0.0, 1.0);
+    return vec3(
+      1.0 - smoothstep(0.35, 0.55, t) + 0.55 * smoothstep(0.80, 1.0, t),
+      smoothstep(0.08, 0.35, t) * (1.0 - smoothstep(0.55, 0.85, t)),
+      smoothstep(0.45, 0.75, t));
+  }
+  void main() {
+    float a = 1.0 - vSide * vSide;
+    a = uSpectral > 0.5 ? sqrt(a) : a * a;
+    vec3 col = mix(uColor, spectrum(vSide * 0.5 + 0.5), uSpectral);
+    gl_FragColor = vec4(col, a * uOpacity);
+  }`;
+
+function ribbonMat({ color, opacity = 0.9, spectral = 0, minHalfDeg = 0, widthMul = 1 }) {
+  return new THREE.ShaderMaterial({
+    uniforms: {
+      uHalfWidth: widthU,
+      uWidthMul: { value: widthMul },
+      uMinHalf: { value: R * Math.tan(minHalfDeg * DEG) },
+      uColor: { value: new THREE.Color(color) },
+      uOpacity: { value: opacity },
+      uSpectral: { value: spectral },
+    },
+    vertexShader: RIBBON_VS, fragmentShader: RIBBON_FS,
+    transparent: true, depthTest: false, depthWrite: false,
+    blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  });
+}
+
+// Realistic band: for each wavelength, intensity = profile(offset − shift_λ); the offset is in
+// degrees across the band (or along it, for parhelia). Colour = Σ spectral RGB × intensity.
+const REAL_VS = `
+  attribute vec3 sideDir;
+  attribute float side;
+  attribute float wgt;
+  attribute float along;
+  uniform float uInner, uOuter;
+  varying float vOff, vAlong, vW, vSinAlt;
+  varying vec3 vC;
+  void main() {
+    float off = side < 0.0 ? -uInner : uOuter;
+    vOff = off; vAlong = along; vW = wgt; vC = position;
+    vec3 p = position + sideDir * (length(position) * tan(radians(off)));
+    vSinAlt = normalize(p).y;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+  }`;
+const REAL_FS = `
+  uniform vec3 uLam[10];
+  uniform float uShift[10];
+  uniform float uAmp[10];
+  uniform float uSigma, uT1, uT2, uMix, uSym, uAlong, uSigmaV, uTau, uPeak;
+  uniform vec3 uI;
+  varying float vOff, vAlong, vW, vSinAlt;
+  varying vec3 vC;
+  ${VIS_GLSL}
+  void main() {
+    float q = uAlong > 0.5 ? vAlong : vOff;
+    vec3 c = vec3(0.0);
+    for (int i = 0; i < 10; i++) {
+      float x = q - uShift[i];
+      float f = (x < 0.0 || uSym > 0.5)
+        ? exp(-0.5 * x * x / (uSigma * uSigma))
+        : uMix * exp(-x / uT1) + (1.0 - uMix) * exp(-x / uT2);
+      c += uLam[i] * (f * uAmp[i]);
+    }
+    float env = uAlong > 0.5 ? exp(-0.5 * vOff * vOff / (uSigmaV * uSigmaV)) : 1.0;
+    float m = max(vSinAlt, 0.03);
+    float ts = min(uTau / m, 8.0);
+    float veil = ts * exp(-ts);                              // single scattering in the ice-crystal layer
+    vec3 Tdown = exp(-(vec3(5.802e-3, 13.558e-3, 33.1e-3) * 5.06 + 4.4e-3 * 1.2) / m);
+    float hz = smoothstep(-0.003, 0.012, vSinAlt);          // clouds are hidden below the horizon
+    // Is this part of the arc bright enough to stand out? Peak radiance at the arc centre
+    // against the sky + cloud behind it.
+    vec3 dc = normalize(vC);
+    float mc = max(dc.y, 0.03), tc = min(uTau / mc, 8.0);
+    vec3 Tdc = exp(-(vec3(5.802e-3, 13.558e-3, 33.1e-3) * 5.06 + 4.4e-3 * 1.2) / mc);
+    float Lh = uPeak * dot(uI * Tdc, LUMA) * tc * exp(-tc) * vW * smoothstep(-0.003, 0.012, dc.y);
+    float vis = visibility(Lh, dc);
+    gl_FragColor = vec4(max(c, vec3(0.0)) * uI * Tdown * (env * veil * hz * vW * vis), 1.0);
+  }`;
+
+// Peak luminance of a band's cross-section (all wavelengths added), for the contrast test.
+function profilePeak(spec, disp) {
+  const mix = spec.mix ?? 1, t1 = spec.t1 || 1, t2 = spec.t2 || 1, sg = spec.sigma;
+  const lo = Math.min(0, ...disp.shift) - 4 * sg, hi = Math.max(0, ...disp.shift) + 4 * sg;
+  let best = 0;
+  for (let k = 0; k <= 240; k++) {
+    const q = lo + (hi - lo) * (k / 240);
+    let r = 0, g = 0, b = 0;
+    for (let i = 0; i < LAMBDAS.length; i++) {
+      const x = q - disp.shift[i];
+      const f = (x < 0 || spec.sym) ? Math.exp(-0.5 * x * x / (sg * sg)) : mix * Math.exp(-x / t1) + (1 - mix) * Math.exp(-x / t2);
+      r += LAM_RGB[i].x * f * disp.amp[i]; g += LAM_RGB[i].y * f * disp.amp[i]; b += LAM_RGB[i].z * f * disp.amp[i];
+    }
+    best = Math.max(best, 0.2126 * Math.max(r, 0) + 0.7152 * Math.max(g, 0) + 0.0722 * Math.max(b, 0));
+  }
+  return best;
+}
+
+function realMat(spec, disp, inner, outer, intensity, tau) {
+  return new THREE.ShaderMaterial({
+    uniforms: {
+      ...visU,
+      uPeak: { value: profilePeak(spec, disp) },
+      uLam: { value: LAM_RGB }, uShift: { value: disp.shift }, uAmp: { value: disp.amp },
+      uSigma: { value: spec.sigma }, uT1: { value: spec.t1 || 1 }, uT2: { value: spec.t2 || 1 },
+      uMix: { value: spec.mix ?? 1 }, uSym: { value: spec.sym ? 1 : 0 },
+      uAlong: { value: spec.along ? 1 : 0 }, uSigmaV: { value: spec.sigmaV || 1 },
+      uTau: { value: tau }, uI: { value: intensity },
+      uInner: { value: inner }, uOuter: { value: outer },
+    },
+    vertexShader: REAL_VS, fragmentShader: REAL_FS,
+    transparent: true, depthTest: false, depthWrite: false,
+    blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  });
+}
+
+// orientSun: flip the band so +side faces away from the sun (red inside, violet outside).
+function makeRibbon(points, mat, orientSun = null) {
+  const n = points.length;
+  if (n < 2) return null;
+  const pos = new Float32Array(n * 6), sdir = new Float32Array(n * 6), side = new Float32Array(n * 2);
+  const wgt = new Float32Array(n * 2), along = new Float32Array(n * 2);
+  const t = new THREE.Vector3(), s = new THREE.Vector3(), u = new THREE.Vector3();
+  let flip = 1;
+  const perPoint = orientSun === 'tail';      // bright side given per point (e.g. mirrored caustics)
+  if (orientSun && !perPoint) {
+    const m = n >> 1;
+    u.copy(points[m]).normalize();
+    t.subVectors(points[Math.min(n - 1, m + 1)], points[Math.max(0, m - 1)]);
+    s.crossVectors(u, t).normalize();
+    const st = orientSun.clone().addScaledVector(u, -orientSun.dot(u));
+    if (s.dot(st) > 0) flip = -1;
+  }
+  for (let i = 0; i < n; i++) {
+    const p = points[i];
+    t.subVectors(points[Math.min(n - 1, i + 1)], points[Math.max(0, i - 1)]);
+    u.copy(p).normalize();
+    s.crossVectors(u, t);
+    if (s.lengthSq() < 1e-14) s.set(0, 1, 0);
+    s.normalize().multiplyScalar(perPoint && p.tail ? (s.dot(p.tail) < 0 ? -1 : 1) : flip);
+    for (let k = 0; k < 2; k++) {
+      const j = 2 * i + k;
+      pos[3 * j] = p.x; pos[3 * j + 1] = p.y; pos[3 * j + 2] = p.z;
+      sdir[3 * j] = s.x; sdir[3 * j + 1] = s.y; sdir[3 * j + 2] = s.z;
+      side[j] = k ? 1 : -1;
+      wgt[j] = p.w ?? 1;
+      along[j] = p.along ?? 0;
+    }
+  }
+  const idx = [];
+  for (let i = 0; i < n - 1; i++) { const a = 2 * i; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('sideDir', new THREE.BufferAttribute(sdir, 3));
+  g.setAttribute('side', new THREE.BufferAttribute(side, 1));
+  g.setAttribute('wgt', new THREE.BufferAttribute(wgt, 1));
+  g.setAttribute('along', new THREE.BufferAttribute(along, 1));
+  g.setIndex(idx);
+  const mesh = new THREE.Mesh(g, mat);
+  mesh.frustumCulled = false;
+  mesh.renderOrder = 5;
+  return mesh;
+}
+
+// ─── Origin-facing billboards (consistent in every projection) ──
+
+const planeGeo = new THREE.PlaneGeometry(1, 1);
+const SHARED_TEX = new Set();
+
+function radialTexture(stops, size = 128) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  stops.forEach(([o, col]) => g.addColorStop(o, col));
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, size, size);
+  const tex = new THREE.CanvasTexture(c);
+  SHARED_TEX.add(tex);
+  return tex;
+}
+const pointTexture = radialTexture([[0, 'rgba(255,255,255,1)'], [0.18, 'rgba(255,255,255,0.95)'], [0.45, 'rgba(255,255,255,0.32)'], [1, 'rgba(255,255,255,0)']]);
+const sunTexture = radialTexture([[0, 'rgba(255,246,214,1)'], [0.12, 'rgba(255,240,192,0.96)'], [0.34, 'rgba(255,214,140,0.42)'], [0.65, 'rgba(255,196,120,0.12)'], [1, 'rgba(255,180,100,0)']], 256);
+
+function makeBillboard(tex, dir, sizeDeg, color = 0xffffff, opts = {}) {
+  const mat = new THREE.MeshBasicMaterial({
+    map: tex, color, transparent: true, depthTest: false, depthWrite: false,
+    opacity: opts.opacity ?? 1,
+    blending: opts.additive === false ? THREE.NormalBlending : THREE.AdditiveBlending,
+    side: THREE.DoubleSide,
+  });
+  const m = new THREE.Mesh(planeGeo, mat);
+  const size = 2 * R * Math.tan(sizeDeg * DEG / 2);
+  m.scale.set(size, size, 1);
+  m.position.copy(dir).normalize().multiplyScalar(R);
+  m.lookAt(0, 0, 0);
+  m.renderOrder = opts.order ?? 8;
+  m.frustumCulled = false;
+  return m;
+}
+
+function disposeObj(o) {
+  o.traverse(c => {
+    if (c.geometry && c.geometry !== planeGeo) c.geometry.dispose();
+    if (c.material) {
+      if (c.material.map && !SHARED_TEX.has(c.material.map)) c.material.map.dispose();
+      c.material.dispose();
+    }
+  });
+}
+
+// ─── Reference layers ──────────────────────────────────────
+
+const refGroups = {};
+const labelCanvases = [];
+
+function drawLabel(c, text) {
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.font = '600 92px "Cormorant Garamond", Georgia, serif';
+  ctx.fillStyle = '#a4afcb';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, c.width / 2, c.height / 2 + 4);
+}
+
+function buildReferences() {
+  const horizon = new THREE.Group();
+  const ring = [];
+  for (let i = 0; i <= 256; i++) ring.push(altAzToVec(0, (i / 256) * 360, R));
+  horizon.add(makeRibbon(ring, ribbonMat({ color: 0x5a6886, opacity: 0.85, widthMul: 0.55 })));
+  refGroups.horizon = horizon;
+
+  const grid = new THREE.Group();
+  for (const a of [30, 60]) {
+    const pts = [];
+    for (let i = 0; i <= 192; i++) pts.push(altAzToVec(a, (i / 192) * 360, R));
+    grid.add(makeRibbon(pts, ribbonMat({ color: 0x4b5776, opacity: 0.5, widthMul: 0.4 })));
+  }
+  for (let az = 0; az < 360; az += 30) {
+    const pts = [];
+    for (let a = 0; a <= 88; a += 2) pts.push(altAzToVec(a, az, R));
+    grid.add(makeRibbon(pts, ribbonMat({ color: 0x4b5776, opacity: 0.4, widthMul: 0.4 })));
+  }
+  refGroups.grid = grid;
+
+  const cardinal = new THREE.Group();
+  ['N', 'E', 'S', 'W'].forEach((L, i) => {
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    drawLabel(c, L);
+    const tex = new THREE.CanvasTexture(c);
+    labelCanvases.push({ c, tex, L });
+    cardinal.add(makeBillboard(tex, altAzToVec(3.4, i * 90), 6.5, 0xffffff, { additive: false, opacity: 0.9, order: 9 }));
+  });
+  refGroups.cardinal = cardinal;
+
+  const N = 700, pos = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    const u = Math.random() * 2 - 1, ph = Math.random() * Math.PI * 2, s = Math.sqrt(1 - u * u);
+    pos[3 * i] = Math.cos(ph) * s * R * 1.6; pos[3 * i + 1] = u * R * 1.6; pos[3 * i + 2] = Math.sin(ph) * s * R * 1.6;
+  }
+  const sg = new THREE.BufferGeometry();
+  sg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  refGroups.stars = new THREE.Points(sg, new THREE.PointsMaterial({
+    color: 0xb4bdd4, size: 1.3, sizeAttenuation: false, transparent: true, opacity: 0.5, depthWrite: false,
+  }));
+
+  for (const k in refGroups) { refGroups[k].visible = state.ref[k]; scene.add(refGroups[k]); }
+}
+buildReferences();
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => { labelCanvases.forEach(l => { drawLabel(l.c, l.L); l.tex.needsUpdate = true; }); markScene(); });
+}
+
+// Sun: a stylised disc for the diagram, and for the realistic mode an HDR disc plus glare.
+const sunCoreTex = radialTexture([[0, 'rgba(255,255,255,1)'], [0.62, 'rgba(255,255,255,1)'], [0.8, 'rgba(255,255,255,0.35)'], [1, 'rgba(255,255,255,0)']]);
+const sunGlareTex = (() => {
+  const size = 256, c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d'), img = ctx.createImageData(size, size);
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const r = Math.hypot(x - size / 2 + 0.5, y - size / 2 + 0.5) / (size / 2);
+    const v = r >= 1 ? 0 : (0.8 * Math.exp(-r / 0.03) + 0.17 * Math.exp(-r / 0.1) + 0.03 * Math.exp(-r / 0.3)) * (1 - r * r);
+    const i = 4 * (y * size + x);
+    img.data[i] = img.data[i + 1] = img.data[i + 2] = 255;
+    img.data[i + 3] = Math.round(255 * Math.min(1, v));
+  }
+  ctx.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(c);
+  SHARED_TEX.add(t);
+  return t;
+})();
+const sunDiag = makeBillboard(sunTexture, altAzToVec(state.sunAlt, state.sunAz), 7.5, 0xffffff, { additive: false, order: 10 });
+const sunCore = makeBillboard(sunCoreTex, altAzToVec(state.sunAlt, state.sunAz), 0.75, 0xffffff, { order: 11 });
+const sunGlare = makeBillboard(sunGlareTex, altAzToVec(state.sunAlt, state.sunAz), 18, 0xffffff, { order: 10 });
+const sunGroup = new THREE.Group();
+sunGroup.add(sunDiag, sunCore, sunGlare);
+scene.add(sunGroup);
+
+// ─── Halos ─────────────────────────────────────────────────
+
+const haloGroup = new THREE.Group();
+scene.add(haloGroup);
+
+function rebuildHalos() {
+  const sd = altAzToVec(state.sunAlt, state.sunAz);
+  const real = state.render === 'real';
+  for (const m of sunGroup.children) { m.position.copy(sd).multiplyScalar(R); m.lookAt(0, 0, 0); }
+  sunDiag.visible = !real;
+  sunCore.visible = sunGlare.visible = real;
+  for (const c of [...haloGroup.children]) { haloGroup.remove(c); disposeObj(c); }
+
+  let ctx = null;
+  if (real) {
+    const Tg = sunTransmittance(0.35, sd);      // sun as seen from the ground
+    const Tc = sunTransmittance(8.0, sd);       // sunlight reaching the ice-crystal layer
+    const tau = veilTau(state.veil);
+    const dim = state.sunAlt > 0 ? Math.exp(-tau / Math.max(Math.sin(state.sunAlt * DEG), 0.03)) : 1;
+    sunCore.material.color.setRGB(Tg.x, Tg.y, Tg.z).multiplyScalar(SUN_E * 60 * HDR.store * dim);
+    sunGlare.material.color.setRGB(Tg.x, Tg.y, Tg.z).multiplyScalar(SUN_E * 0.15 * HDR.store * dim);
+    ctx = { Tc, tau, h: state.sunAlt };
+    atmoU.uSun.value.copy(sd);
+    atmoU.uTau.value = ctx.tau;
+    skyDirty = true;
+  }
+
+  for (const p of PHENOMENA) {
+    const data = p.compute(sd) || [];
+    const g = new THREE.Group();
+    let present = false;
+    if (real) {
+      present = data.some(d => (d.isVector3 ? true : d && d.length >= 2));
+      if (p.on && present) buildRealistic(p, data, sd, ctx, g);
+    } else if (p.kind === 'line') {
+      for (const br of data) {
+        if (!br || br.length < 2) continue;
+        present = true;
+        if (!p.on) continue;
+        const mat = ribbonMat({ color: p.color, opacity: p.opacity ?? 0.9, spectral: p.spectral || 0, minHalfDeg: p.minHalfDeg || 0 });
+        g.add(makeRibbon(br, mat, p.spectral ? sd : null));
+      }
+    } else {
+      for (const v of data) {
+        present = true;
+        if (p.on) g.add(makeBillboard(pointTexture, v, p.size || 4, p.color));
+      }
+    }
+    p.present = present;
+    g.userData.id = p.id;
+    if (g.children.length) haloGroup.add(g);
+  }
+  refreshChips();
+}
+
+function taperEnds(pts, deg) {
+  const n = pts.length;
+  if (pts[0].angleTo(pts[n - 1]) < 1e-3) return;           // closed curve
+  const cum = [0];
+  for (let i = 1; i < n; i++) cum.push(cum[i - 1] + pts[i - 1].angleTo(pts[i]) * RAD);
+  const L = cum[n - 1], d = Math.min(deg, L * 0.25);
+  const [t0, t1] = pts.taper || [true, true];                // ends that join another branch stay open
+  for (let i = 0; i < n; i++) {
+    pts[i].w = (pts[i].w ?? 1) * (t0 ? smoothstep(0, d, cum[i]) : 1) * (t1 ? smoothstep(0, d, L - cum[i]) : 1);
+  }
+}
+
+// Realistic point halo (anthelion, 120° parhelia, subsun): a soft spot with the visibility test.
+const SPOT_FS = `
+  uniform sampler2D map;
+  uniform vec3 uColor, uDir;
+  varying vec2 vUv;
+  ${VIS_GLSL}
+  void main() {
+    float vis = visibility(dot(uColor, LUMA), normalize(uDir));
+    gl_FragColor = vec4(uColor * (texture2D(map, vUv).a * vis), 1.0);
+  }`;
+function makeSpot(dir, color, sizeDeg) {
+  const mat = new THREE.ShaderMaterial({
+    uniforms: { ...visU, map: { value: pointTexture }, uColor: { value: color }, uDir: { value: dir.clone().normalize() } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: SPOT_FS,
+    transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  });
+  const m = new THREE.Mesh(planeGeo, mat);
+  const size = 2 * R * Math.tan(sizeDeg * DEG / 2);
+  m.scale.set(size, size, 1);
+  m.position.copy(dir).normalize().multiplyScalar(R);
+  m.lookAt(0, 0, 0);
+  m.renderOrder = 8;
+  m.frustumCulled = false;
+  return m;
+}
+
+function buildRealistic(p, data, sd, ctx, g) {
+  const spec = REAL[p.id];
+  if (!spec) return;
+  let k = spec.k;
+  if (p.id === 'cza') k *= Math.max(0, Math.sin(ctx.h * DEG) * (1 - (ctx.h / 32.2) ** 4)) / 0.29;
+  const I = ctx.Tc.clone().multiplyScalar(SUN_E * k * HDR.store);
+  if (spec.spot) {
+    for (const v of data) {
+      const alt = vecToAltAz(v).alt;
+      const m = Math.max(Math.sin(Math.abs(alt) * DEG), 0.03);
+      const ts = Math.min(ctx.tau / m, 8);
+      const veil = (alt > 0 || p.id === 'subsun') ? ts * Math.exp(-ts) : 0;
+      const td = [5.802e-3, 13.558e-3, 33.1e-3].map(b => Math.exp(-(b * 5.06 + 4.4e-3 * 1.2) / m));
+      g.add(makeSpot(v, new THREE.Vector3(I.x * td[0], I.y * td[1], I.z * td[2]).multiplyScalar(veil), spec.size));
+    }
+    return;
+  }
+  const disp = dispersionShifts(spec.disp, ctx.h);
+  const minS = Math.min(0, ...disp.shift), maxS = Math.max(0, ...disp.shift);
+  const inner = 3 * spec.sigma - minS;
+  const outer = maxS + (spec.sym ? 3 * spec.sigma : Math.min(3.5 * spec.t2, 12));
+  if (spec.along) {
+    // Parhelia: colour runs along the parhelic circle (red toward the sun, white tail outward).
+    const dNom = sundogAzOf(N_ICE, ctx.h);
+    if (!Number.isFinite(dNom)) return;
+    const { az } = vecToAltAz(sd);
+    const ch = Math.max(Math.cos(ctx.h * DEG), 0.2);
+    const a0 = inner / ch, a1 = outer / ch;
+    const hv = 3 * spec.sigmaV;
+    for (const dir of [-1, 1]) {
+      const pts = [];
+      for (let i = 0; i <= 64; i++) {
+        const azo = dNom - a0 + (a0 + a1) * (i / 64);
+        const v = altAzToVec(ctx.h, az + dir * azo, R);
+        v.along = (azo - dNom) * ch;
+        pts.push(v);
+      }
+      g.add(makeRibbon(pts, realMat(spec, disp, hv, hv, I, ctx.tau), null));
+    }
+    return;
+  }
+  for (const br of data) {
+    if (!br || br.length < 2) continue;
+    taperEnds(br, 2.0);
+    g.add(makeRibbon(br, realMat(spec, disp, inner, outer, I, ctx.tau), spec.disp ? (spec.orient === 'tail' ? 'tail' : sd) : null));
+  }
+}
+
+// ─── Cameras: perspective and fisheye (stereographic via cube map) ──
+
+const camera = new THREE.PerspectiveCamera(80, 1, 0.1, R * 8);
+
+const cubeRT = new THREE.WebGLCubeRenderTarget(Math.min(1024, renderer.capabilities.maxCubemapSize), {
+  type: HDR.type, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter,
+});
+const cubeCam = new THREE.CubeCamera(0.1, R * 8, cubeRT);
+
+// Exposure + ACES filmic tone curve + sRGB, shared by the perspective and fisheye passes.
+const toneU = { uExposure: { value: EXPOSURE_BASE }, uDecode: { value: 1 / HDR.store } };
+const TONE_GLSL = `
+  uniform float uExposure, uDecode;
+  vec3 aces(vec3 x) { return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
+  float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+  vec3 toDisplay(vec3 c) {
+    c = pow(aces(c * uDecode * uExposure), vec3(1.0 / 2.2));
+    return c + (hash(gl_FragCoord.xy) - 0.5) / 255.0;
+  }`;
+
+const fishU = {
+  uTone: { value: 0 },
+  uExposure: toneU.uExposure,
+  uDecode: toneU.uDecode,
+  tCube: { value: cubeRT.texture },
+  uRight: { value: new THREE.Vector3(1, 0, 0) },
+  uUp: { value: new THREE.Vector3(0, 1, 0) },
+  uFwd: { value: new THREE.Vector3(0, 0, -1) },
+  uSize: { value: new THREE.Vector2(1, 1) },
+  uCenter: { value: new THREE.Vector2(0.5, 0.5) },
+  uF: { value: 100 },
+};
+const fishScene = new THREE.Scene();
+const fishCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+fishScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
+  uniforms: fishU, depthTest: false, depthWrite: false,
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+  fragmentShader: `
+    uniform samplerCube tCube;
+    uniform vec3 uRight, uUp, uFwd;
+    uniform vec2 uSize, uCenter;
+    uniform float uF, uTone;
+    varying vec2 vUv;
+    ${TONE_GLSL}
+    void main() {
+      vec2 q = (vUv * uSize - uCenter) / uF;          // stereographic plane, r = 2 tan(θ/2)
+      float r = length(q);
+      float th = 2.0 * atan(0.5 * r);
+      vec2 d2 = r > 1e-6 ? q / r : vec2(0.0);
+      vec3 d = uFwd * cos(th) + (uRight * d2.x + uUp * d2.y) * sin(th);
+      vec3 c = textureCube(tCube, d).rgb;
+      if (uTone > 0.5) c = toDisplay(c);
+      c = mix(c, vec3(0.008, 0.010, 0.018), smoothstep(3.02, 3.12, th));
+      gl_FragColor = vec4(c, 1.0);
+    }`,
+})));
+
+const rtMain = new THREE.WebGLRenderTarget(4, 4, {
+  type: HDR.type, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false,
+});
+const postScene = new THREE.Scene();
+postScene.add(new THREE.Mesh(quadGeo, new THREE.ShaderMaterial({
+  uniforms: { tSrc: { value: rtMain.texture }, uExposure: toneU.uExposure, uDecode: toneU.uDecode },
+  depthTest: false, depthWrite: false, vertexShader: QUAD_VS,
+  fragmentShader: `
+    uniform sampler2D tSrc;
+    varying vec2 vUv;
+    ${TONE_GLSL}
+    void main() { gl_FragColor = vec4(toDisplay(texture2D(tSrc, vUv).rgb), 1.0); }`,
+})));
+
+// Visible area = screen minus the control panel; the view is centred in it.
+const uiEl = document.getElementById('ui');
+const hintEl = document.getElementById('hint');
+const layout = { W: 1, H: 1, dx: 0, dy: 0, visW: 1, visH: 1 };
+function measure() {
+  layout.W = canvas.clientWidth || window.innerWidth;
+  layout.H = canvas.clientHeight || window.innerHeight;
+  const r = uiEl.getBoundingClientRect();
+  let right = 0, bottom = 0;
+  if (landscapeMQ.matches) right = clamp(layout.W - r.left, 0, layout.W * 0.7);
+  else bottom = clamp(layout.H - r.top, 0, layout.H * 0.7);
+  layout.visW = Math.max(80, layout.W - right);
+  layout.visH = Math.max(80, layout.H - bottom);
+  layout.dx = -right / 2;
+  layout.dy = -bottom / 2;
+  hintEl.style.left = (layout.W / 2 + layout.dx) + 'px';
+  hintEl.style.top = (layout.H / 2 + layout.dy) + 'px';
+}
+
+// state.fov = field of view across the SHORT side of the visible area.
+function centerPxPerRad() {
+  const s = Math.min(layout.visW, layout.visH) / 2;
+  const half = state.fov * DEG / 2;
+  return state.proj === 'fish' ? s / (2 * Math.tan(half / 2)) : s / Math.tan(half);
+}
+
+const basis = { fwd: new THREE.Vector3(), right: new THREE.Vector3(), up: new THREE.Vector3() };
+const _m4 = new THREE.Matrix4(), _back = new THREE.Vector3();
+
+function applyView() {
+  const y = state.yaw * DEG, p = state.pitch * DEG;
+  basis.fwd.set(Math.cos(p) * Math.sin(y), Math.sin(p), -Math.cos(p) * Math.cos(y));
+  basis.right.set(Math.cos(y), 0, Math.sin(y));
+  basis.up.crossVectors(basis.right, basis.fwd);
+
+  const f = centerPxPerRad();
+  const halfDeg = clamp(state.lineMul / (f * DEG), 0.1, 2.0);   // bands stay ≥ lineMul CSS px wide
+  const w = R * Math.tan(halfDeg * DEG);
+  if (Math.abs(w - widthU.value) > 1e-5) { widthU.value = w; cubeDirty = true; }
+
+  if (state.proj === 'persp') {
+    _m4.makeBasis(basis.right, basis.up, _back.copy(basis.fwd).negate());
+    camera.quaternion.setFromRotationMatrix(_m4);
+    const { W, H, dx, dy } = layout;
+    const Wf = W + 2 * Math.abs(dx), Hf = H + 2 * Math.abs(dy);
+    camera.aspect = Wf / Hf;
+    camera.fov = Math.min(2 * Math.atan((Hf / 2) / f) * RAD, 172);
+    camera.setViewOffset(Wf, Hf, Math.abs(dx) - dx, Math.abs(dy) - dy, W, H);
+    camera.updateProjectionMatrix();
+  } else {
+    fishU.uRight.value.copy(basis.right);
+    fishU.uUp.value.copy(basis.up);
+    fishU.uFwd.value.copy(basis.fwd);
+    fishU.uSize.value.set(layout.W, layout.H);
+    fishU.uCenter.value.set(layout.W / 2 + layout.dx, layout.H / 2 - layout.dy);
+    fishU.uF.value = f;
+  }
+  needsRender = true;
+  updateReadout();
+}
+
+// ─── Render loop (on demand) ───────────────────────────────
+
+let haloDirty = true, cubeDirty = true, needsRender = true, skyDirty = true;
+let inertia = false, lastT = performance.now();
+const vel = { yaw: 0, pitch: 0 };
+function markScene() { cubeDirty = true; needsRender = true; }
+
+function tick(t) {
+  requestAnimationFrame(tick);
+  const dt = Math.min(50, t - lastT);
+  lastT = t;
+  if (inertia) {
+    rotateBy(vel.yaw * dt, vel.pitch * dt, true);
+    const k = Math.pow(0.9, dt / 16.7);
+    vel.yaw *= k; vel.pitch *= k;
+    if (Math.abs(vel.yaw) + Math.abs(vel.pitch) < 0.0008) inertia = false;
+  }
+  if (haloDirty) { haloDirty = false; rebuildHalos(); markScene(); }
+  if (!needsRender) return;
+  needsRender = false;
+  renderFrame();
+}
+
+function renderFrame() {
+  const real = state.render === 'real';
+  if (real && skyDirty) {
+    renderer.setRenderTarget(skyRT);
+    renderer.render(atmoScene, fishCam);
+    renderer.setRenderTarget(null);
+    skyDirty = false;
+    cubeDirty = true;
+  }
+  if (state.proj === 'fish') {
+    if (cubeDirty) { cubeCam.update(renderer, scene); cubeDirty = false; }
+    fishU.uTone.value = real ? 1 : 0;
+    renderer.render(fishScene, fishCam);
+  } else if (real) {
+    renderer.setRenderTarget(rtMain);
+    renderer.render(scene, camera);
+    renderer.setRenderTarget(null);
+    renderer.render(postScene, fishCam);
+  } else {
+    renderer.render(scene, camera);
+  }
+}
+
+// ─── Gestures: 1 finger look around, 2 fingers zoom ───────
+
+function rotateBy(dyaw, dpitch, fromInertia = false) {
+  state.yaw = ((state.yaw + dyaw) % 360 + 360) % 360;
+  state.pitch = clamp(state.pitch + dpitch, -90, 90);
+  if (!fromInertia) setActiveView(null);
+  applyView();
+}
+function setFov(v) {
+  const [lo, hi] = FOV_RANGE[state.proj];
+  state.fov = clamp(v, lo, hi);
+  fovSlider.value = state.fov;
+  fovVal.textContent = Math.round(state.fov) + '°';
+  applyView();
+}
+
+const ptrs = new Map();
+let pinch0 = 0, fov0 = 0, lastMove = 0;
+canvas.addEventListener('pointerdown', e => {
+  canvas.setPointerCapture(e.pointerId);
+  ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  inertia = false; vel.yaw = vel.pitch = 0;
+  if (ptrs.size === 2) {
+    const [a, b] = [...ptrs.values()];
+    pinch0 = Math.hypot(a.x - b.x, a.y - b.y);
+    fov0 = state.fov;
+  }
+  hideHint();
+});
+canvas.addEventListener('pointermove', e => {
+  const p = ptrs.get(e.pointerId);
+  if (!p) return;
+  const dx = e.clientX - p.x, dy = e.clientY - p.y;
+  p.x = e.clientX; p.y = e.clientY;
+  if (ptrs.size === 1) {
+    const k = 1 / (centerPxPerRad() * DEG);          // degrees per CSS px: the sky follows the finger
+    const dyaw = -dx * k, dpitch = dy * k;
+    rotateBy(dyaw, dpitch);
+    const now = performance.now(), dt = Math.max(8, now - lastMove);
+    lastMove = now;
+    vel.yaw = 0.7 * vel.yaw + 0.3 * (dyaw / dt);
+    vel.pitch = 0.7 * vel.pitch + 0.3 * (dpitch / dt);
+  } else if (ptrs.size === 2 && pinch0 > 0) {
+    const [a, b] = [...ptrs.values()];
+    const d = Math.hypot(a.x - b.x, a.y - b.y);
+    if (d > 0) setFov(fov0 * pinch0 / d);
+  }
+});
+function endPointer(e) {
+  if (!ptrs.has(e.pointerId)) return;
+  ptrs.delete(e.pointerId);
+  if (ptrs.size < 2) pinch0 = 0;
+  if (ptrs.size === 0 && !reduceMotion && performance.now() - lastMove < 70 &&
+      Math.abs(vel.yaw) + Math.abs(vel.pitch) > 0.004) inertia = true;
+}
+canvas.addEventListener('pointerup', endPointer);
+canvas.addEventListener('pointercancel', endPointer);
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  setFov(state.fov * Math.exp(e.deltaY * 0.0012));
+}, { passive: false });
+document.addEventListener('gesturestart', e => e.preventDefault());   // iOS page zoom
+window.addEventListener('keydown', e => {
+  if (e.target instanceof HTMLInputElement) return;
+  const k = { ArrowLeft: [-3, 0], ArrowRight: [3, 0], ArrowUp: [0, 3], ArrowDown: [0, -3] }[e.key];
+  if (k) { rotateBy(k[0], k[1]); e.preventDefault(); }
+  if (e.key === '+' || e.key === '=') setFov(state.fov / 1.12);
+  if (e.key === '-') setFov(state.fov * 1.12);
+});
+
+// ─── UI ────────────────────────────────────────────────────
+
+const $ = (id) => document.getElementById(id);
+const altSlider = $('alt'), azSlider = $('az'), fovSlider = $('fov');
+const altVal = $('alt-val'), azVal = $('az-val'), fovVal = $('fov-val');
+const readout = $('readout');
+
+const fmtAz = (a) => (Math.abs(a - Math.round(a)) < 0.05 ? String(Math.round(a)) : a.toFixed(1));
+function syncSun() {
+  altSlider.value = state.sunAlt;
+  azSlider.value = state.sunAz;
+  altVal.textContent = state.sunAlt.toFixed(1) + '°';
+  azVal.textContent = fmtAz(state.sunAz) + '°';
+  haloDirty = true;
+  updateReadout();
+}
+altSlider.addEventListener('input', () => { state.sunAlt = parseFloat(altSlider.value); syncSun(); });
+azSlider.addEventListener('input', () => { state.sunAz = parseFloat(azSlider.value); syncSun(); });
+
+function nudge(key, d) {
+  if (key === 'alt') state.sunAlt = clamp(Math.round((state.sunAlt + d) * 2) / 2, -5, 80);
+  else state.sunAz = ((state.sunAz + d) % 360 + 360) % 360;
+  syncSun();
+}
+document.querySelectorAll('.step').forEach(b => {
+  const [key, d] = b.dataset.step.split(':');
+  let t1 = 0, t2 = 0;
+  const stop = () => { clearTimeout(t1); clearInterval(t2); };
+  b.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    nudge(key, parseFloat(d));
+    t1 = setTimeout(() => { t2 = setInterval(() => nudge(key, parseFloat(d)), 70); }, 380);
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, stop));
+  b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nudge(key, parseFloat(d)); } });
+});
+$('restore').addEventListener('click', () => {
+  state.sunAlt = SHOT.alt; state.sunAz = SHOT.az;
+  syncSun();
+  setView('sun');
+});
+
+// Tabs
+const tabs = [...document.querySelectorAll('.tab')];
+function openTab(name) {
+  uiEl.dataset.open = (uiEl.dataset.open === name) ? '' : name;
+  tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === uiEl.dataset.open)));
+  onResize();
+}
+tabs.forEach(t => t.addEventListener('click', () => openTab(t.dataset.tab)));
+
+// Views & projection
+const PRESETS = {
+  sun:  () => ({ proj: 'persp', yaw: state.sunAz, pitch: clamp(state.sunAlt + 4, -10, 86), fov: 80 }),
+  up:   () => ({ proj: 'fish', yaw: state.sunAz, pitch: clamp((state.sunAlt + 90) / 2, 0, 90), fov: 150 }),
+  anti: () => ({ proj: 'persp', yaw: (state.sunAz + 180) % 360, pitch: clamp(state.sunAlt, 0, 80), fov: 95 }),
+  all:  () => ({ proj: 'fish', yaw: state.sunAz, pitch: 90, fov: 186 }),
+};
+function setActiveView(v) {
+  document.querySelectorAll('.vbtn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
+}
+function setProj(p) {
+  state.proj = p;
+  const [lo, hi] = FOV_RANGE[p];
+  fovSlider.min = lo; fovSlider.max = hi;
+  document.querySelectorAll('.pbtn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.proj === p)));
+  cubeDirty = true;
+}
+function setView(v) {
+  const s = PRESETS[v]();
+  setProj(s.proj);
+  state.yaw = ((s.yaw % 360) + 360) % 360;
+  state.pitch = s.pitch;
+  setActiveView(v);
+  setFov(s.fov);
+}
+document.querySelectorAll('.vbtn').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+document.querySelectorAll('.pbtn').forEach(b => b.addEventListener('click', () => {
+  if (b.dataset.proj === state.proj) return;
+  setProj(b.dataset.proj);
+  setActiveView(null);
+  setFov(state.proj === 'fish' ? Math.max(state.fov, 180) : Math.min(state.fov, 100));
+}));
+fovSlider.addEventListener('input', () => { setActiveView(null); setFov(parseFloat(fovSlider.value)); });
+
+// Phenomena chips
+const chipsEl = $('chips');
+PHENOMENA.forEach(p => {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'chip';
+  const sw = p.spectral
+    ? 'linear-gradient(90deg,#ff5a4a,#ffc94a,#6ad67a,#5aa0ff,#a77cff)'
+    : '#' + p.color.toString(16).padStart(6, '0');
+  b.innerHTML =
+    `<span class="sw" style="background:${sw}"></span>` +
+    `<span class="nm"><span class="jp">${p.jp.split('|').join('<wbr>')}</span><span class="en">${p.en}</span></span>` +
+    `<span class="tags">${p.approx ? '<span>近似</span>' : ''}<span class="absent-tag">今は出ない</span></span>`;
+  b.addEventListener('click', () => { p.on = !p.on; refreshChips(); haloDirty = true; });
+  chipsEl.appendChild(b);
+  p.chip = b;
+});
+function refreshChips() {
+  PHENOMENA.forEach(p => {
+    if (!p.chip) return;
+    p.chip.setAttribute('aria-pressed', String(p.on));
+    p.chip.classList.toggle('absent', !p.present);
+  });
+}
+$('all-on').addEventListener('click', () => { PHENOMENA.forEach(p => p.on = true); refreshChips(); haloDirty = true; });
+$('all-off').addEventListener('click', () => { PHENOMENA.forEach(p => p.on = false); refreshChips(); haloDirty = true; });
+$('all-def').addEventListener('click', () => { PHENOMENA.forEach(p => p.on = p.def); refreshChips(); haloDirty = true; });
+
+// Display toggles
+document.querySelectorAll('.tog').forEach(b => b.addEventListener('click', () => {
+  const k = b.dataset.ref;
+  state.ref[k] = !state.ref[k];
+  b.setAttribute('aria-pressed', String(state.ref[k]));
+  applyRefVisibility();
+  markScene();
+}));
+function applyRefVisibility() {
+  for (const k in refGroups) refGroups[k].visible = state.ref[k] && !(k === 'stars' && state.render === 'real');
+}
+
+// Display mode: diagram (colour-coded) or realistic (sky and light colours)
+function setRender(mode) {
+  state.render = mode;
+  document.body.dataset.render = mode;
+  document.querySelectorAll('.mbtn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.render === mode)));
+  skyDome.material = mode === 'real' ? skyRealMat : skyDiagMat;
+  applyRefVisibility();
+  skyDirty = true;
+  haloDirty = true;
+  markScene();
+}
+document.querySelectorAll('.mbtn').forEach(b => b.addEventListener('click', () => setRender(b.dataset.render)));
+const veilSlider = $('veil'), evSlider = $('ev');
+veilSlider.addEventListener('input', () => {
+  state.veil = parseFloat(veilSlider.value) / 100;
+  $('veil-val').textContent = veilTau(state.veil).toFixed(2);
+  haloDirty = true;
+});
+evSlider.addEventListener('input', () => {
+  state.ev = parseFloat(evSlider.value);
+  $('ev-val').textContent = state.ev === 0 ? '±0' : (state.ev > 0 ? '+' : '−') + Math.abs(state.ev).toFixed(1);
+  toneU.uExposure.value = EXPOSURE_BASE * Math.pow(2, state.ev);
+  needsRender = true;
+});
+document.querySelectorAll('.wbtn').forEach(b => b.addEventListener('click', () => {
+  state.lineMul = parseFloat(b.dataset.w);
+  document.querySelectorAll('.wbtn').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  applyView();
+  markScene();
+}));
+
+function updateReadout() {
+  readout.innerHTML =
+    `太陽 高度<span class="num">${state.sunAlt.toFixed(1)}°</span> 方位<span class="num">${fmtAz(state.sunAz)}°</span><br>` +
+    `視野<span class="num">${Math.round(state.fov)}°</span>${state.proj === 'fish' ? '魚眼' : '透視'}`;
+}
+
+// Hint
+const coarse = window.matchMedia('(pointer: coarse)').matches;
+hintEl.textContent = coarse ? '1本指で見回す　2本指でズーム' : 'ドラッグで見回す　ホイールでズーム';
+let hintTimer = setTimeout(() => hintEl.classList.add('show'), 400);
+let hintHide = setTimeout(hideHint, 4600);
+function hideHint() { clearTimeout(hintTimer); clearTimeout(hintHide); hintEl.classList.remove('show'); }
+
+// Resize / orientation
+function onResize() {
+  const w = canvas.clientWidth || window.innerWidth, h = canvas.clientHeight || window.innerHeight;
+  renderer.setSize(w, h, false);
+  const db = renderer.getDrawingBufferSize(new THREE.Vector2());
+  rtMain.setSize(Math.max(1, db.x), Math.max(1, db.y));
+  measure();
+  applyView();
+  markScene();
+}
+window.addEventListener('resize', onResize);
+if (landscapeMQ.addEventListener) landscapeMQ.addEventListener('change', () => requestAnimationFrame(onResize));
+if (window.ResizeObserver) new ResizeObserver(() => onResize()).observe(uiEl);
+
+// ─── Start ─────────────────────────────────────────────────
+document.body.dataset.render = state.render;
+applyRefVisibility();
+syncSun();
+onResize();
+setView('sun');
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
+
+</body></html>
