@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#070a14">
-<title>Halo Atlas — 占冠村 2016年10月25日</title>
+<title>HaloAtlas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Noto+Serif+JP:wght@400;500;600&display=swap" rel="stylesheet">
@@ -114,6 +114,16 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   color: var(--sky-ink-2); font-size: 0.78rem;
 }
 .mode-pill button[aria-pressed="true"] { background: rgba(201, 165, 106, 0.26); color: var(--sky-ink); }
+.follow-pill {
+  pointer-events: auto; display: inline-flex; align-items: center; gap: 6px;
+  min-height: 36px; padding: 0 14px 0 11px; border-radius: 999px;
+  background: rgba(7, 10, 20, 0.55); border: 1px solid rgba(230, 236, 247, 0.18);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  color: rgba(230, 236, 247, 0.62); font-size: 0.78rem; text-shadow: none;
+}
+.follow-pill svg { width: 16px; height: 16px; flex: none; }
+.follow-pill[aria-pressed="true"] { background: rgba(7, 10, 20, 0.66); border-color: rgba(214, 178, 116, 0.9); color: #f0d49e; }
+.follow-pill[aria-pressed="false"] svg { opacity: 0.6; }
 .real-only { display: none; }
 body[data-render="real"] .real-only { display: block; }
 .wordmark {
@@ -121,7 +131,6 @@ body[data-render="real"] .real-only { display: block; }
   font-size: 1.6rem; line-height: 1; letter-spacing: 0.015em;
   color: var(--sky-ink);
 }
-.where { font-size: 0.68rem; color: var(--sky-ink-2); margin-top: 0.4rem; letter-spacing: 0.04em; }
 .readout { text-align: right; font-size: 0.7rem; color: var(--sky-ink-2); line-height: 1.5; white-space: nowrap; }
 .readout .num { font-size: 1.05rem; color: var(--sky-brass); margin: 0 0.1em 0 0.25em; }
 
@@ -233,6 +242,21 @@ input[type="range"]::-moz-range-thumb {
 h3 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin: 16px 0 6px; }
 .note { font-size: 0.72rem; color: var(--ink-3); margin-top: 12px; line-height: 1.65; }
 
+/* date, time and place fields */
+.field { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.field label { font-size: 0.7rem; color: var(--ink-3); }
+.field input {
+  width: 100%; min-height: 42px; padding: 0 9px; border-radius: 10px;
+  border: 1px solid var(--well-line); background: var(--well); color: var(--ink);
+  font-family: var(--serif-en); font-size: 1.05rem; font-variant-numeric: lining-nums tabular-nums;
+  color-scheme: light dark; -webkit-appearance: none; appearance: none;
+}
+.field input:focus-visible { outline: 2px solid var(--brass); outline-offset: 1px; }
+.date-row { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: end; margin-top: 8px; }
+.date-row .opt { min-width: 64px; }
+.place { margin-top: 8px; }
+#ui[data-link="0"] .clock-only { opacity: 0.55; }
+
 /* phenomena chips */
 .chips-head { display: flex; gap: 6px; margin-bottom: 10px; }
 .chips-head button {
@@ -287,7 +311,6 @@ h3 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin: 16px 0 6
 }
 @media (min-width: 1000px) and (min-height: 640px) {
   .wordmark { font-size: 2.2rem; }
-  .where { font-size: 0.78rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   #hint { transition: none; }
@@ -299,8 +322,7 @@ h3 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin: 16px 0 6
 
 <header id="hud">
   <div class="brand">
-    <div class="wordmark">Halo Atlas</div>
-    <div class="where">占冠村　2016年10月25日 12:00</div>
+    <div class="wordmark">HaloAtlas</div>
   </div>
   <div class="hud-right">
     <div class="readout" id="readout" aria-live="polite"></div>
@@ -308,20 +330,48 @@ h3 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin: 16px 0 6
       <button class="mbtn" data-render="diagram" aria-pressed="false">図解</button>
       <button class="mbtn" data-render="real" aria-pressed="true">実景</button>
     </div>
+    <button class="follow-pill" id="follow" type="button" aria-pressed="true" title="時刻を動かしたとき、今の構図のまま太陽を追います">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5V5.5M12 18.5v3M2.5 12h3M18.5 12h3"/><circle cx="12" cy="12" r="7.5" stroke-dasharray="2 3"/></svg>
+      太陽を追う
+    </button>
   </div>
 </header>
 
 <div id="hint" role="status"></div>
 
-<div id="ui" data-open="sun">
+<div id="ui" data-open="sun" data-link="1">
   <section id="sheet" aria-label="操作パネル">
 
     <div class="panel" data-panel="sun">
+      <div class="grid2" role="group" aria-label="太陽の位置の決め方">
+        <button class="opt lbtn" data-link="1" aria-pressed="true">日時・場所から計算</button>
+        <button class="opt lbtn" data-link="0" aria-pressed="false">手動</button>
+      </div>
+      <div class="clock-only">
+        <div class="ctl gap">
+          <div class="ctl-head"><label for="time">時刻 <span class="unit" id="tz-unit">UTC+9</span></label><output id="time-val" for="time">12:00</output></div>
+          <div class="ctl-row">
+            <button class="step" data-step="time:-5" aria-label="5分戻す">−</button>
+            <input type="range" id="time" min="0" max="1439" step="1" value="720">
+            <button class="step" data-step="time:5" aria-label="5分進める">+</button>
+          </div>
+        </div>
+        <div class="date-row">
+          <div class="field"><label for="date">日付</label><input type="date" id="date" value="2016-10-25" required></div>
+          <button class="opt" id="now" type="button">今</button>
+        </div>
+        <div class="grid3 place">
+          <div class="field"><label for="lat">緯度（北が +）</label><input type="number" id="lat" inputmode="decimal" min="-90" max="90" step="0.01" value="43.02"></div>
+          <div class="field"><label for="lon">経度（東が +）</label><input type="number" id="lon" inputmode="decimal" min="-180" max="180" step="0.01" value="142.40"></div>
+          <div class="field"><label for="tz">時差（UTC+）</label><input type="number" id="tz" inputmode="decimal" min="-12" max="14" step="0.5" value="9"></div>
+        </div>
+      </div>
+      <h3>太陽の位置</h3>
       <div class="ctl">
         <div class="ctl-head"><label for="alt">太陽高度</label><output id="alt-val" for="alt">33.8°</output></div>
         <div class="ctl-row">
           <button class="step" data-step="alt:-0.5" aria-label="高度を下げる">−</button>
-          <input type="range" id="alt" min="-5" max="80" step="0.1" value="33.8">
+          <input type="range" id="alt" min="-20" max="90" step="0.1" value="33.8">
           <button class="step" data-step="alt:0.5" aria-label="高度を上げる">+</button>
         </div>
       </div>
@@ -333,7 +383,8 @@ h3 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin: 16px 0 6
           <button class="step" data-step="az:1" aria-label="方位を右へ">+</button>
         </div>
       </div>
-      <button class="wide" id="restore" type="button">撮影時の太陽に戻す</button>
+      <p class="note">日時と場所から太陽の見かけの位置を計算します（NOAA の式、大気差を含む）。高度・方位を直接動かすと手動に切り替わり、日時や場所に触れると計算に戻ります。</p>
+      <button class="wide" id="restore" type="button">最初の日時・場所に戻す</button>
     </div>
 
     <div class="panel" data-panel="view">
@@ -1092,10 +1143,48 @@ const REAL = {
 
 // ─── State ─────────────────────────────────────────────────
 
-const SHOT = { alt: 33.8, az: 193.5 };      // 2016-10-25 12:00:19 JST, 43.02°N 142.40°E
+// The recording: IMG_2586.mov, 2016-10-25 12:00:19 JST, Shimukappu (占冠村) 43.02°N 142.40°E.
+// Default date, time and place for now.
+const SHOT = { date: '2016-10-25', min: 12 * 60 + 19 / 60, lat: 43.02, lon: 142.40, tz: 9 };
+
+// Apparent position of the sun (NOAA / Meeus low-precision, with NOAA refraction; halos form around
+// the sun as seen, so refraction belongs in). date 'YYYY-MM-DD', minutes of local clock time, tz in
+// hours east of UTC. Checked against astropy for 2016–2030, both hemispheres: within 0.01°.
+function solarPosition(dateStr, minutes, lat, lon, tz) {
+  const [Y, M, D] = dateStr.split('-').map(Number);
+  const ms = Date.UTC(Y, M - 1, D) + (minutes - tz * 60) * 60000;
+  const jd = ms / 86400000 + 2440587.5, T = (jd - 2451545) / 36525;
+  const L0 = ((280.46646 + T * (36000.76983 + T * 0.0003032)) % 360 + 360) % 360;
+  const Mr = (357.52911 + T * (35999.05029 - 0.0001537 * T)) * DEG;
+  const e = 0.016708634 - T * (0.000042037 + 0.0000001267 * T);
+  const C = Math.sin(Mr) * (1.914602 - T * (0.004817 + 0.000014 * T)) + Math.sin(2 * Mr) * (0.019993 - 0.000101 * T) + Math.sin(3 * Mr) * 0.000289;
+  const om = (125.04 - 1934.136 * T) * DEG;
+  const lam = (L0 + C - 0.00569 - 0.00478 * Math.sin(om)) * DEG;
+  const eps0 = 23 + (26 + (21.448 - T * (46.815 + T * (0.00059 - T * 0.001813))) / 60) / 60;
+  const eps = (eps0 + 0.00256 * Math.cos(om)) * DEG;
+  const dec = Math.asin(Math.sin(eps) * Math.sin(lam));
+  const y = Math.tan(eps / 2) ** 2, L = L0 * DEG;
+  const eot = 4 * RAD * (y * Math.sin(2 * L) - 2 * e * Math.sin(Mr) + 4 * e * y * Math.sin(Mr) * Math.cos(2 * L)
+    - 0.5 * y * y * Math.sin(4 * L) - 1.25 * e * e * Math.sin(2 * Mr));            // equation of time, minutes
+  const utcMin = ((ms / 60000) % 1440 + 1440) % 1440;
+  const ha = ((utcMin + eot + 4 * lon) / 4 - 180) * DEG, la = lat * DEG;            // hour angle
+  const cz = Math.sin(la) * Math.sin(dec) + Math.cos(la) * Math.cos(dec) * Math.cos(ha);
+  let alt = 90 - Math.acos(clamp(cz, -1, 1)) * RAD;
+  const az = (Math.atan2(Math.sin(ha), Math.cos(ha) * Math.sin(la) - Math.tan(dec) * Math.cos(la)) * RAD + 540) % 360;
+  if (alt > -0.575) {                                                               // refraction, arcseconds
+    const te = Math.tan(alt * DEG);
+    alt += (alt > 5 ? 58.1 / te - 0.07 / te ** 3 + 0.000086 / te ** 5
+      : 1735 + alt * (-518.2 + alt * (103.4 + alt * (-12.79 + alt * 0.711)))) / 3600;
+  }
+  return { alt, az };
+}
+const SHOT_SUN = solarPosition(SHOT.date, SHOT.min, SHOT.lat, SHOT.lon, SHOT.tz);   // 33.78°, 193.52°
+
 const FOV_RANGE = { persp: [20, 120], fish: [60, 230] };
 const state = {
-  sunAlt: SHOT.alt, sunAz: SHOT.az,
+  sunAlt: SHOT_SUN.alt, sunAz: SHOT_SUN.az,
+  link: true,                               // sun follows date / time / place
+  clock: { ...SHOT },
   yaw: 180, pitch: 38, fov: 80, proj: 'persp',
   lineMul: 1.3,
   render: 'real', veil: 0.5, ev: 0,
@@ -1927,6 +2016,7 @@ function rotateBy(dyaw, dpitch, fromInertia = false) {
   state.yaw = ((state.yaw + dyaw) % 360 + 360) % 360;
   state.pitch = clamp(state.pitch + dpitch, -90, 90);
   if (!fromInertia) setActiveView(null);
+  captureFollow();                                   // a drag re-frames; following continues
   applyView();
 }
 function setFov(v, keepAnchor = false) {
@@ -2006,13 +2096,73 @@ function syncSun() {
   altVal.textContent = state.sunAlt.toFixed(1) + '°';
   azVal.textContent = fmtAz(state.sunAz) + '°';
   haloDirty = true;
+  followSun();
   updateReadout();
 }
-altSlider.addEventListener('input', () => { state.sunAlt = parseFloat(altSlider.value); syncSun(); });
-azSlider.addEventListener('input', () => { state.sunAz = parseFloat(azSlider.value); syncSun(); });
+altSlider.addEventListener('input', () => { setLink(false); state.sunAlt = parseFloat(altSlider.value); syncSun(); });
+azSlider.addEventListener('input', () => { setLink(false); state.sunAz = parseFloat(azSlider.value); syncSun(); });
+
+// ─── Date, time and place → sun ─────────────────────────────
+const timeSlider = $('time'), timeVal = $('time-val'), dateIn = $('date');
+const latIn = $('lat'), lonIn = $('lon'), tzIn = $('tz'), tzUnit = $('tz-unit');
+const pad2 = (n) => String(n).padStart(2, '0');
+const fmtClock = (min) => { const m = Math.floor(min + 1e-6); return pad2(Math.floor(m / 60)) + ':' + pad2(m % 60); };
+const fmtTz = (tz) => 'UTC' + (tz >= 0 ? '+' : '−') + (Math.abs(tz) % 1 ? Math.abs(tz).toFixed(1) : Math.abs(tz));
+const shiftDate = (s, days) => { const [y, m, d] = s.split('-').map(Number); const t = new Date(Date.UTC(y, m - 1, d + days)); return t.toISOString().slice(0, 10); };
+function syncClockUI() {
+  const c = state.clock;
+  timeSlider.value = Math.floor(c.min);
+  timeVal.textContent = fmtClock(c.min);
+  if (dateIn.value !== c.date) dateIn.value = c.date;
+  if (document.activeElement !== latIn) latIn.value = c.lat;
+  if (document.activeElement !== lonIn) lonIn.value = c.lon;
+  if (document.activeElement !== tzIn) tzIn.value = c.tz;
+  tzUnit.textContent = fmtTz(c.tz);
+}
+function setLink(on) {
+  if (state.link === on) return;
+  state.link = on;
+  uiEl.dataset.link = on ? '1' : '0';
+  document.querySelectorAll('.lbtn').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.link === '1') === on)));
+  if (on) applyClock(); else syncClockUI();
+}
+function applyClock() {
+  state.link = true;
+  uiEl.dataset.link = '1';
+  document.querySelectorAll('.lbtn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.link === '1')));
+  const c = state.clock, p = solarPosition(c.date, c.min, c.lat, c.lon, c.tz);
+  state.sunAlt = p.alt; state.sunAz = p.az;
+  syncClockUI();
+  syncSun();
+}
+timeSlider.addEventListener('input', () => { state.clock.min = parseFloat(timeSlider.value); applyClock(); });
+dateIn.addEventListener('change', () => { if (/^\d{4}-\d{2}-\d{2}$/.test(dateIn.value)) { state.clock.date = dateIn.value; applyClock(); } else syncClockUI(); });
+for (const [el, key, lo, hi] of [[latIn, 'lat', -90, 90], [lonIn, 'lon', -180, 180], [tzIn, 'tz', -12, 14]]) {
+  el.addEventListener('input', () => {                     // apply while typing when the value is valid
+    const v = parseFloat(el.value);
+    if (Number.isFinite(v) && v >= lo && v <= hi) { state.clock[key] = v; applyClock(); }
+  });
+  el.addEventListener('change', () => syncClockUI());      // on leaving the field, show the value in use
+}
+$('now').addEventListener('click', () => {
+  const t = new Date(Date.now() + state.clock.tz * 3600000);   // clock time at the chosen time zone
+  state.clock.date = t.toISOString().slice(0, 10);
+  state.clock.min = t.getUTCHours() * 60 + t.getUTCMinutes() + t.getUTCSeconds() / 60;
+  applyClock();
+});
+document.querySelectorAll('.lbtn').forEach(b => b.addEventListener('click', () => setLink(b.dataset.link === '1')));
 
 function nudge(key, d) {
-  if (key === 'alt') state.sunAlt = clamp(Math.round((state.sunAlt + d) * 2) / 2, -5, 80);
+  if (key === 'time') {
+    let m = Math.round((state.clock.min + d) / 5) * 5;       // snap to 5 minutes
+    if (m < 0) { m += 1440; state.clock.date = shiftDate(state.clock.date, -1); }
+    if (m >= 1440) { m -= 1440; state.clock.date = shiftDate(state.clock.date, 1); }
+    state.clock.min = m;
+    applyClock();
+    return;
+  }
+  setLink(false);
+  if (key === 'alt') state.sunAlt = clamp(Math.round((state.sunAlt + d) * 2) / 2, -20, 90);
   else state.sunAz = ((state.sunAz + d) % 360 + 360) % 360;
   syncSun();
 }
@@ -2029,8 +2179,8 @@ document.querySelectorAll('.step').forEach(b => {
   b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nudge(key, parseFloat(d)); } });
 });
 $('restore').addEventListener('click', () => {
-  state.sunAlt = SHOT.alt; state.sunAz = SHOT.az;
-  syncSun();
+  state.clock = { ...SHOT };
+  applyClock();
   setView('sun');
 });
 
@@ -2060,8 +2210,38 @@ function anchoredPitch(a) {
   const half = Math.atan(layout.visH / 2 / f) * RAD;              // centre → top edge
   return clamp(Math.max(low, a.top - half), -10, 86);
 }
+// Following the sun (toggle in the HUD). While on, the view keeps its framing relative to the sun
+// as the sun moves (time slider etc.): a preset view is recomputed; after a drag, the view keeps
+// the azimuth / pitch offset from the sun that the drag left it at, so dragging re-frames rather
+// than stopping the follow.
+let activeView = null, follow = true;
+const followOff = { dYaw: 0, dPitch: null };
 function setActiveView(v) {
+  activeView = v;
   document.querySelectorAll('.vbtn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
+}
+function captureFollow() {
+  followOff.dYaw = ((state.yaw - state.sunAz) % 360 + 540) % 360 - 180;
+  followOff.dPitch = state.proj === 'persp' ? state.pitch - state.sunAlt : null;   // fisheye: azimuth only
+}
+function followSun() {
+  if (!follow) return;
+  if (activeView) {
+    const s = PRESETS[activeView]();
+    state.yaw = ((s.yaw % 360) + 360) % 360;
+    if (horizonAnchor && s.anchor) horizonAnchor = s.anchor;
+    else if (!s.anchor) state.pitch = s.pitch;     // fisheye presets: pitch depends on the sun too
+  } else {
+    state.yaw = ((state.sunAz + followOff.dYaw) % 360 + 360) % 360;
+    if (followOff.dPitch !== null) state.pitch = clamp(state.sunAlt + followOff.dPitch, -10, 90);
+  }
+  applyView();
+  cubeDirty = true;
+}
+function setFollow(on) {
+  follow = on;
+  document.getElementById('follow').setAttribute('aria-pressed', String(on));
+  if (on && !activeView) captureFollow();
 }
 function setProj(p) {
   state.proj = p;
@@ -2084,8 +2264,10 @@ document.querySelectorAll('.pbtn').forEach(b => b.addEventListener('click', () =
   if (b.dataset.proj === state.proj) return;
   setProj(b.dataset.proj);
   setActiveView(null);
+  captureFollow();
   setFov(state.proj === 'fish' ? Math.max(state.fov, 180) : Math.min(state.fov, 100));
 }));
+document.getElementById('follow').addEventListener('click', () => setFollow(!follow));
 fovSlider.addEventListener('input', () => { setActiveView(null); setFov(parseFloat(fovSlider.value)); });
 
 // Phenomena chips
@@ -2189,7 +2371,7 @@ if (window.ResizeObserver) new ResizeObserver(() => onResize()).observe(uiEl);
 // ─── Start ─────────────────────────────────────────────────
 document.body.dataset.render = state.render;
 applyRefVisibility();
-syncSun();
+applyClock();
 onResize();
 setView('sun');
 requestAnimationFrame(tick);
