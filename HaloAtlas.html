@@ -103,6 +103,17 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6), 0 0 2px rgba(0, 0, 0, 0.45);
 }
 .hud-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+
+/* ── ground overlay: bottom quarter of the visible sky ── */
+#ground {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 0 calc(env(safe-area-inset-right, 0px) + 16px) calc(env(safe-area-inset-bottom, 0px) + 14px) calc(env(safe-area-inset-left, 0px) + 16px);
+  pointer-events: none;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6), 0 0 2px rgba(0, 0, 0, 0.45);
+  transition: right 0.2s, bottom 0.2s;
+}
+.sun-readout { text-align: right; }
 .mode-pill {
   pointer-events: auto; display: inline-flex; padding: 3px; border-radius: 999px;
   background: rgba(7, 10, 20, 0.55); border: 1px solid rgba(230, 236, 247, 0.18);
@@ -255,7 +266,6 @@ h3 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin: 16px 0 6
 .date-row { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: end; margin-top: 8px; }
 .date-row .opt { min-width: 64px; }
 .place { margin-top: 8px; }
-#ui[data-link="0"] .clock-only { opacity: 0.55; }
 
 /* phenomena chips */
 .chips-head { display: flex; gap: 6px; margin-bottom: 10px; }
@@ -305,7 +315,7 @@ h3 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin: 16px 0 6
   .tab[aria-selected="true"]::before { top: 50%; left: 0; width: 2px; height: 24px; margin: -12px 0 0 0; border-radius: 0 2px 2px 0; }
   #hud { right: auto; flex-direction: column; gap: 10px; }
   .hud-right { align-items: flex-start; }
-  .readout { text-align: left; }
+  .hud-right .readout { text-align: left; }
   .readout .num { margin: 0 0.1em 0 0.25em; }
   .grid4 { grid-template-columns: repeat(2, 1fr); }
 }
@@ -326,64 +336,45 @@ h3 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin: 16px 0 6
   </div>
   <div class="hud-right">
     <div class="readout" id="readout" aria-live="polite"></div>
-    <div class="mode-pill" role="group" aria-label="表示モード">
-      <button class="mbtn" data-render="diagram" aria-pressed="false">図解</button>
-      <button class="mbtn" data-render="real" aria-pressed="true">実景</button>
-    </div>
-    <button class="follow-pill" id="follow" type="button" aria-pressed="true" title="時刻を動かしたとき、今の構図のまま太陽を追います">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5V5.5M12 18.5v3M2.5 12h3M18.5 12h3"/><circle cx="12" cy="12" r="7.5" stroke-dasharray="2 3"/></svg>
-      太陽を追う
-    </button>
   </div>
 </header>
 
 <div id="hint" role="status"></div>
 
-<div id="ui" data-open="sun" data-link="1">
+<div id="ground">
+  <button class="follow-pill" id="follow" type="button" aria-pressed="true" title="時刻を動かしたとき、今の構図のまま太陽を追います">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5V5.5M12 18.5v3M2.5 12h3M18.5 12h3"/><circle cx="12" cy="12" r="7.5" stroke-dasharray="2 3"/></svg>
+    太陽を追う
+  </button>
+  <div class="mode-pill" role="group" aria-label="表示モード">
+    <button class="mbtn" data-render="diagram" aria-pressed="false">図解</button>
+    <button class="mbtn" data-render="real" aria-pressed="true">実景</button>
+  </div>
+  <div class="readout sun-readout" id="sun-readout" aria-live="polite"></div>
+</div>
+
+<div id="ui" data-open="sun">
   <section id="sheet" aria-label="操作パネル">
 
     <div class="panel" data-panel="sun">
-      <div class="grid2" role="group" aria-label="太陽の位置の決め方">
-        <button class="opt lbtn" data-link="1" aria-pressed="true">日時・場所から計算</button>
-        <button class="opt lbtn" data-link="0" aria-pressed="false">手動</button>
-      </div>
-      <div class="clock-only">
-        <div class="ctl gap">
-          <div class="ctl-head"><label for="time">時刻 <span class="unit" id="tz-unit">UTC+9</span></label><output id="time-val" for="time">12:00</output></div>
-          <div class="ctl-row">
-            <button class="step" data-step="time:-5" aria-label="5分戻す">−</button>
-            <input type="range" id="time" min="0" max="1439" step="1" value="720">
-            <button class="step" data-step="time:5" aria-label="5分進める">+</button>
-          </div>
-        </div>
-        <div class="date-row">
-          <div class="field"><label for="date">日付</label><input type="date" id="date" value="2016-10-25" required></div>
-          <button class="opt" id="now" type="button">今</button>
-        </div>
-        <div class="grid3 place">
-          <div class="field"><label for="lat">緯度（北が +）</label><input type="number" id="lat" inputmode="decimal" min="-90" max="90" step="0.01" value="43.02"></div>
-          <div class="field"><label for="lon">経度（東が +）</label><input type="number" id="lon" inputmode="decimal" min="-180" max="180" step="0.01" value="142.40"></div>
-          <div class="field"><label for="tz">時差（UTC+）</label><input type="number" id="tz" inputmode="decimal" min="-12" max="14" step="0.5" value="9"></div>
-        </div>
-      </div>
-      <h3>太陽の位置</h3>
-      <div class="ctl">
-        <div class="ctl-head"><label for="alt">太陽高度</label><output id="alt-val" for="alt">33.8°</output></div>
+      <div class="ctl gap">
+        <div class="ctl-head"><label for="time">時刻 <span class="unit" id="tz-unit">UTC+9</span></label><output id="time-val" for="time">12:00</output></div>
         <div class="ctl-row">
-          <button class="step" data-step="alt:-0.5" aria-label="高度を下げる">−</button>
-          <input type="range" id="alt" min="-20" max="90" step="0.1" value="33.8">
-          <button class="step" data-step="alt:0.5" aria-label="高度を上げる">+</button>
+          <button class="step" data-step="time:-5" aria-label="5分戻す">−</button>
+          <input type="range" id="time" min="0" max="1439" step="1" value="720">
+          <button class="step" data-step="time:5" aria-label="5分進める">+</button>
         </div>
       </div>
-      <div class="ctl">
-        <div class="ctl-head"><label for="az">太陽方位</label><output id="az-val" for="az">193.5°</output></div>
-        <div class="ctl-row">
-          <button class="step" data-step="az:-1" aria-label="方位を左へ">−</button>
-          <input type="range" id="az" min="0" max="359.5" step="0.5" value="193.5">
-          <button class="step" data-step="az:1" aria-label="方位を右へ">+</button>
-        </div>
+      <div class="date-row">
+        <div class="field"><label for="date">日付</label><input type="date" id="date" value="2016-10-25" required></div>
+        <button class="opt" id="now" type="button">今</button>
       </div>
-      <p class="note">日時と場所から太陽の見かけの位置を計算します（NOAA の式、大気差を含む）。高度・方位を直接動かすと手動に切り替わり、日時や場所に触れると計算に戻ります。</p>
+      <div class="grid3 place">
+        <div class="field"><label for="lat">緯度（北が +）</label><input type="number" id="lat" inputmode="decimal" min="-90" max="90" step="0.01" value="43.02"></div>
+        <div class="field"><label for="lon">経度（東が +）</label><input type="number" id="lon" inputmode="decimal" min="-180" max="180" step="0.01" value="142.40"></div>
+        <div class="field"><label for="tz">時差（UTC+）</label><input type="number" id="tz" inputmode="decimal" min="-12" max="14" step="0.5" value="9"></div>
+      </div>
+      <p class="note">日時と場所から太陽の見かけの位置を計算します（NOAA の式、大気差を含む）。今の太陽高度・方位は画面下の表示で確認できます。</p>
       <button class="wide" id="restore" type="button">最初の日時・場所に戻す</button>
     </div>
 
@@ -1183,7 +1174,6 @@ const SHOT_SUN = solarPosition(SHOT.date, SHOT.min, SHOT.lat, SHOT.lon, SHOT.tz)
 const FOV_RANGE = { persp: [20, 120], fish: [60, 230] };
 const state = {
   sunAlt: SHOT_SUN.alt, sunAz: SHOT_SUN.az,
-  link: true,                               // sun follows date / time / place
   clock: { ...SHOT },
   yaw: 180, pitch: 38, fov: 80, proj: 'persp',
   lineMul: 1.3,
@@ -1904,6 +1894,7 @@ postScene.add(new THREE.Mesh(quadGeo, new THREE.ShaderMaterial({
 // Visible area = screen minus the control panel; the view is centred in it.
 const uiEl = document.getElementById('ui');
 const hintEl = document.getElementById('hint');
+const groundEl = document.getElementById('ground');
 const layout = { W: 1, H: 1, dx: 0, dy: 0, visW: 1, visH: 1 };
 function measure() {
   layout.W = canvas.clientWidth || window.innerWidth;
@@ -1918,6 +1909,8 @@ function measure() {
   layout.dy = -bottom / 2;
   hintEl.style.left = (layout.W / 2 + layout.dx) + 'px';
   hintEl.style.top = (layout.H / 2 + layout.dy) + 'px';
+  groundEl.style.bottom = bottom + 'px';
+  groundEl.style.right = right + 'px';
 }
 
 // state.fov = field of view across the SHORT side of the visible area.
@@ -2085,22 +2078,21 @@ window.addEventListener('keydown', e => {
 // ─── UI ────────────────────────────────────────────────────
 
 const $ = (id) => document.getElementById(id);
-const altSlider = $('alt'), azSlider = $('az'), fovSlider = $('fov');
-const altVal = $('alt-val'), azVal = $('az-val'), fovVal = $('fov-val');
+const fovSlider = $('fov'), fovVal = $('fov-val');
 const readout = $('readout');
+const sunReadout = $('sun-readout');
 
 const fmtAz = (a) => (Math.abs(a - Math.round(a)) < 0.05 ? String(Math.round(a)) : a.toFixed(1));
+function updateSunReadout() {
+  sunReadout.innerHTML =
+    `太陽高度<span class="num">${state.sunAlt.toFixed(1)}°</span><br>` +
+    `太陽方位<span class="num">${fmtAz(state.sunAz)}°</span>`;
+}
 function syncSun() {
-  altSlider.value = state.sunAlt;
-  azSlider.value = state.sunAz;
-  altVal.textContent = state.sunAlt.toFixed(1) + '°';
-  azVal.textContent = fmtAz(state.sunAz) + '°';
   haloDirty = true;
   followSun();
-  updateReadout();
+  updateSunReadout();
 }
-altSlider.addEventListener('input', () => { setLink(false); state.sunAlt = parseFloat(altSlider.value); syncSun(); });
-azSlider.addEventListener('input', () => { setLink(false); state.sunAz = parseFloat(azSlider.value); syncSun(); });
 
 // ─── Date, time and place → sun ─────────────────────────────
 const timeSlider = $('time'), timeVal = $('time-val'), dateIn = $('date');
@@ -2119,17 +2111,7 @@ function syncClockUI() {
   if (document.activeElement !== tzIn) tzIn.value = c.tz;
   tzUnit.textContent = fmtTz(c.tz);
 }
-function setLink(on) {
-  if (state.link === on) return;
-  state.link = on;
-  uiEl.dataset.link = on ? '1' : '0';
-  document.querySelectorAll('.lbtn').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.link === '1') === on)));
-  if (on) applyClock(); else syncClockUI();
-}
 function applyClock() {
-  state.link = true;
-  uiEl.dataset.link = '1';
-  document.querySelectorAll('.lbtn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.link === '1')));
   const c = state.clock, p = solarPosition(c.date, c.min, c.lat, c.lon, c.tz);
   state.sunAlt = p.alt; state.sunAz = p.az;
   syncClockUI();
@@ -2150,21 +2132,12 @@ $('now').addEventListener('click', () => {
   state.clock.min = t.getUTCHours() * 60 + t.getUTCMinutes() + t.getUTCSeconds() / 60;
   applyClock();
 });
-document.querySelectorAll('.lbtn').forEach(b => b.addEventListener('click', () => setLink(b.dataset.link === '1')));
-
-function nudge(key, d) {
-  if (key === 'time') {
-    let m = Math.round((state.clock.min + d) / 5) * 5;       // snap to 5 minutes
-    if (m < 0) { m += 1440; state.clock.date = shiftDate(state.clock.date, -1); }
-    if (m >= 1440) { m -= 1440; state.clock.date = shiftDate(state.clock.date, 1); }
-    state.clock.min = m;
-    applyClock();
-    return;
-  }
-  setLink(false);
-  if (key === 'alt') state.sunAlt = clamp(Math.round((state.sunAlt + d) * 2) / 2, -20, 90);
-  else state.sunAz = ((state.sunAz + d) % 360 + 360) % 360;
-  syncSun();
+function nudge(key, d) {                                     // only the time stepper uses this now
+  let m = Math.round((state.clock.min + d) / 5) * 5;          // snap to 5 minutes
+  if (m < 0) { m += 1440; state.clock.date = shiftDate(state.clock.date, -1); }
+  if (m >= 1440) { m -= 1440; state.clock.date = shiftDate(state.clock.date, 1); }
+  state.clock.min = m;
+  applyClock();
 }
 document.querySelectorAll('.step').forEach(b => {
   const [key, d] = b.dataset.step.split(':');
@@ -2343,7 +2316,6 @@ document.querySelectorAll('.wbtn').forEach(b => b.addEventListener('click', () =
 
 function updateReadout() {
   readout.innerHTML =
-    `太陽 高度<span class="num">${state.sunAlt.toFixed(1)}°</span> 方位<span class="num">${fmtAz(state.sunAz)}°</span><br>` +
     `視野<span class="num">${Math.round(state.fov)}°</span>${state.proj === 'fish' ? '魚眼' : '透視'}`;
 }
 
