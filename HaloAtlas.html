@@ -1,4 +1,3 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -144,6 +143,20 @@ body[data-render="real"] .real-only { display: block; }
 }
 .readout { text-align: right; font-size: 0.7rem; color: var(--sky-ink-2); line-height: 1.5; white-space: nowrap; }
 .readout .num { font-size: 1.05rem; color: var(--sky-brass); margin: 0 0.1em 0 0.25em; }
+.clock-hud { display: flex; align-items: center; gap: 10px; }
+.play-btn {
+  pointer-events: auto; flex: none; width: 40px; height: 40px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(7, 10, 20, 0.55); border: 1px solid rgba(230, 236, 247, 0.22);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  color: var(--sky-ink); text-shadow: none;
+}
+.play-btn svg { width: 18px; height: 18px; }
+.play-btn .i-pause { display: none; }
+.play-btn[aria-pressed="true"] { border-color: rgba(214, 178, 116, 0.9); color: #f0d49e; }
+.play-btn[aria-pressed="true"] .i-play { display: none; }
+.play-btn[aria-pressed="true"] .i-pause { display: block; }
+.play-btn:focus-visible { outline: 2px solid rgba(214, 178, 116, 0.9); outline-offset: 2px; }
 
 #hint {
   position: fixed; left: 50%; top: 45%; z-index: 6;
@@ -297,6 +310,37 @@ h3 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin: 16px 0 6
 .chip[aria-pressed="false"] .sw { background: transparent !important; box-shadow: inset 0 0 0 1.5px var(--ink-3); }
 .chip.absent[aria-pressed="true"] .sw { opacity: 0.35; }
 
+/* photo import */
+.photo-btn { margin-top: 0; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.photo-btn svg { width: 18px; height: 18px; flex: none; }
+.photo-card {
+  display: grid; grid-template-columns: 84px 1fr; gap: 10px; align-items: start;
+  margin-top: 10px; padding: 9px; border-radius: 12px;
+  border: 1px solid var(--well-line); background: var(--well);
+}
+.photo-card[hidden] { display: none; }
+.ph-thumb {
+  width: 84px; height: 84px; border-radius: 8px; overflow: hidden;
+  background: rgba(7, 10, 20, 0.5); display: flex; align-items: center; justify-content: center;
+  font-size: 0.62rem; color: var(--ink-3); text-align: center; line-height: 1.3; padding: 4px;
+}
+.ph-thumb img, .ph-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ph-thumb:has(img), .ph-thumb:has(video) { padding: 0; }
+.ph-name { font-size: 0.74rem; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ph-rows { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; row-gap: 3px; margin-top: 4px; font-size: 0.74rem; }
+.ph-rows dt { color: var(--ink-3); }
+.ph-rows dd { color: var(--ink); min-width: 0; }
+.ph-rows dd .num { font-size: 0.92rem; }
+.ph-rows .src { display: block; font-size: 0.62rem; color: var(--brass); line-height: 1.3; }
+.ph-rows .src.weak { color: var(--ink-3); }
+#drop {
+  position: fixed; inset: 0; z-index: 30; display: none;
+  align-items: center; justify-content: center; pointer-events: none;
+  background: rgba(7, 10, 20, 0.55); color: var(--sky-ink); font-size: 1rem;
+}
+#drop::after { content: ''; position: absolute; inset: 14px; border: 2px dashed rgba(201, 165, 106, 0.8); border-radius: 18px; }
+#drop.show { display: flex; }
+
 /* ── landscape: side rail + side sheet ── */
 @media (orientation: landscape) {
   #ui { top: 0; bottom: 0; left: auto; flex-direction: row; }
@@ -316,6 +360,7 @@ h3 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin: 16px 0 6
   #hud { right: auto; flex-direction: column; gap: 10px; }
   .hud-right { align-items: flex-start; }
   .hud-right .readout { text-align: left; }
+  .clock-hud { flex-direction: row; }
   .readout .num { margin: 0 0.1em 0 0.25em; }
   .grid4 { grid-template-columns: repeat(2, 1fr); }
 }
@@ -335,11 +380,18 @@ h3 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin: 16px 0 6
     <div class="wordmark">HaloAtlas</div>
   </div>
   <div class="hud-right">
-    <div class="readout" id="readout" aria-live="polite"></div>
+    <div class="clock-hud">
+      <div class="readout" id="readout"></div>
+      <button class="play-btn" id="play" type="button" aria-pressed="false" aria-label="日の出から日没まで再生" title="日の出から日没まで再生">
+        <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
+        <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="5.5" width="3.6" height="13" rx="1" fill="currentColor"/><rect x="13.4" y="5.5" width="3.6" height="13" rx="1" fill="currentColor"/></svg>
+      </button>
+    </div>
   </div>
 </header>
 
 <div id="hint" role="status"></div>
+<div id="drop" aria-hidden="true">写真・動画をここに放すと、日時と場所を読み込みます</div>
 
 <div id="ground">
   <button class="follow-pill" id="follow" type="button" aria-pressed="true" title="時刻を動かしたとき、今の構図のまま太陽を追います">
@@ -357,6 +409,11 @@ h3 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin: 16px 0 6
   <section id="sheet" aria-label="操作パネル">
 
     <div class="panel" data-panel="sun">
+      <button class="wide photo-btn" id="photo-btn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M8.5 6l1.4-2.2h4.2L15.5 6"/><circle cx="12" cy="12.5" r="3.4"/></svg>
+        写真・動画から日時と場所を読む
+      </button>
+      <input type="file" id="photo-in" accept="image/*,video/*,.heic,.heif,.mov,.mp4,.dng" hidden>
       <div class="ctl gap">
         <div class="ctl-head"><label for="time">時刻 <span class="unit" id="tz-unit">UTC+9</span></label><output id="time-val" for="time">12:00</output></div>
         <div class="ctl-row">
@@ -376,6 +433,14 @@ h3 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin: 16px 0 6
       </div>
       <p class="note">日時と場所から太陽の見かけの位置を計算します（NOAA の式、大気差を含む）。今の太陽高度・方位は画面下の表示で確認できます。</p>
       <button class="wide" id="restore" type="button">最初の日時・場所に戻す</button>
+      <div class="photo-card" id="photo-card" hidden>
+        <div class="ph-thumb" id="ph-thumb"></div>
+        <div>
+          <div class="ph-name" id="ph-name"></div>
+          <dl class="ph-rows" id="ph-rows"></dl>
+        </div>
+      </div>
+      <p class="note" id="ph-note" hidden></p>
     </div>
 
     <div class="panel" data-panel="view">
@@ -426,7 +491,7 @@ h3 { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); margin: 16px 0 6
       <h3>線と目盛り</h3>
       <div class="grid2">
         <button class="opt tog" data-ref="horizon" aria-pressed="true">地平線</button>
-        <button class="opt tog" data-ref="cardinal" aria-pressed="true">東西南北</button>
+        <button class="opt tog" data-ref="cardinal" aria-pressed="true">方位</button>
         <button class="opt tog" data-ref="grid" aria-pressed="false">高度・方位の線</button>
         <button class="opt tog" data-ref="stars" aria-pressed="false">星</button>
       </div>
@@ -1592,14 +1657,27 @@ function disposeObj(o) {
 const refGroups = {};
 const labelCanvases = [];
 
+// Compass labels sit just below the horizon (centre −3.8°). Light letters with a dark buffer (outline + soft glow), so they read on a
+// bright daytime sky as well as on the night sky. Intercardinals are a little smaller.
 function drawLabel(c, text) {
   const ctx = c.getContext('2d');
   ctx.clearRect(0, 0, c.width, c.height);
-  ctx.font = '600 92px "Cormorant Garamond", Georgia, serif';
-  ctx.fillStyle = '#a4afcb';
+  const px = text.length > 1 ? 72 : 88;
+  ctx.font = `700 ${px}px "Cormorant Garamond", Georgia, serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(text, c.width / 2, c.height / 2 + 4);
+  const x = c.width / 2, y = c.height / 2 + 4;
+  ctx.lineJoin = 'round';
+  ctx.shadowColor = 'rgba(4, 7, 16, 0.85)';
+  ctx.shadowBlur = 14;
+  ctx.strokeStyle = 'rgba(8, 12, 24, 0.9)';
+  ctx.lineWidth = 16;
+  ctx.strokeText(text, x, y);
+  ctx.shadowBlur = 0;
+  ctx.lineWidth = 7;
+  ctx.strokeText(text, x, y);
+  ctx.fillStyle = text.length > 1 ? '#dbe2f1' : '#f4f6fb';
+  ctx.fillText(text, x, y);
 }
 
 function buildReferences() {
@@ -1623,13 +1701,15 @@ function buildReferences() {
   refGroups.grid = grid;
 
   const cardinal = new THREE.Group();
-  ['N', 'E', 'S', 'W'].forEach((L, i) => {
+  ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'].forEach((L, i) => {
     const c = document.createElement('canvas');
-    c.width = c.height = 128;
+    c.width = 256; c.height = 128;
     drawLabel(c, L);
     const tex = new THREE.CanvasTexture(c);
     labelCanvases.push({ c, tex, L });
-    cardinal.add(makeBillboard(tex, altAzToVec(3.4, i * 90), 6.5, 0xffffff, { additive: false, opacity: 0.9, order: 9 }));
+    const b = makeBillboard(tex, altAzToVec(-3.8, i * 45), 6.5, 0xffffff, { additive: false, opacity: 0.95, order: 9 });
+    b.scale.x *= 2;                                           // 2:1 canvas
+    cardinal.add(b);
   });
   refGroups.cardinal = cardinal;
 
@@ -1973,6 +2053,7 @@ function tick(t) {
     vel.yaw *= k; vel.pitch *= k;
     if (Math.abs(vel.yaw) + Math.abs(vel.pitch) < 0.0008) inertia = false;
   }
+  if (playing) stepPlay(t);
   if (haloDirty) { haloDirty = false; rebuildHalos(); markScene(); }
   if (!needsRender) return;
   needsRender = false;
@@ -2110,6 +2191,7 @@ function syncClockUI() {
   if (document.activeElement !== lonIn) lonIn.value = c.lon;
   if (document.activeElement !== tzIn) tzIn.value = c.tz;
   tzUnit.textContent = fmtTz(c.tz);
+  updateReadout();
 }
 function applyClock() {
   const c = state.clock, p = solarPosition(c.date, c.min, c.lat, c.lon, c.tz);
@@ -2117,8 +2199,8 @@ function applyClock() {
   syncClockUI();
   syncSun();
 }
-timeSlider.addEventListener('input', () => { state.clock.min = parseFloat(timeSlider.value); applyClock(); });
-dateIn.addEventListener('change', () => { if (/^\d{4}-\d{2}-\d{2}$/.test(dateIn.value)) { state.clock.date = dateIn.value; applyClock(); } else syncClockUI(); });
+timeSlider.addEventListener('input', () => { stopPlay(); state.clock.min = parseFloat(timeSlider.value); applyClock(); });
+dateIn.addEventListener('change', () => { stopPlay(); if (/^\d{4}-\d{2}-\d{2}$/.test(dateIn.value)) { state.clock.date = dateIn.value; applyClock(); } else syncClockUI(); });
 for (const [el, key, lo, hi] of [[latIn, 'lat', -90, 90], [lonIn, 'lon', -180, 180], [tzIn, 'tz', -12, 14]]) {
   el.addEventListener('input', () => {                     // apply while typing when the value is valid
     const v = parseFloat(el.value);
@@ -2127,12 +2209,14 @@ for (const [el, key, lo, hi] of [[latIn, 'lat', -90, 90], [lonIn, 'lon', -180, 1
   el.addEventListener('change', () => syncClockUI());      // on leaving the field, show the value in use
 }
 $('now').addEventListener('click', () => {
+  stopPlay();
   const t = new Date(Date.now() + state.clock.tz * 3600000);   // clock time at the chosen time zone
   state.clock.date = t.toISOString().slice(0, 10);
   state.clock.min = t.getUTCHours() * 60 + t.getUTCMinutes() + t.getUTCSeconds() / 60;
   applyClock();
 });
 function nudge(key, d) {                                     // only the time stepper uses this now
+  stopPlay();
   let m = Math.round((state.clock.min + d) / 5) * 5;          // snap to 5 minutes
   if (m < 0) { m += 1440; state.clock.date = shiftDate(state.clock.date, -1); }
   if (m >= 1440) { m -= 1440; state.clock.date = shiftDate(state.clock.date, 1); }
@@ -2152,10 +2236,67 @@ document.querySelectorAll('.step').forEach(b => {
   b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nudge(key, parseFloat(d)); } });
 });
 $('restore').addEventListener('click', () => {
+  stopPlay();
   state.clock = { ...SHOT };
   applyClock();
   setView('sun');
 });
+
+
+// ─── Sunrise → sunset playback ──────────────────────────────
+// Sunrise/sunset: the apparent centre of the sun at −0.27° (upper limb on the horizon; solarPosition
+// already includes refraction). Found by scanning the day in 4-minute steps and bisecting.
+const RISE_ALT = -0.27, PLAY_RATE = 30;                    // simulated minutes per second
+function sunEvents(c) {
+  const alt = (m) => solarPosition(c.date, m, c.lat, c.lon, c.tz).alt - RISE_ALT;
+  const root = (a, b) => { let fa = alt(a); for (let i = 0; i < 30; i++) { const m = (a + b) / 2, fm = alt(m); if ((fm > 0) === (fa > 0)) { a = m; fa = fm; } else b = m; } return (a + b) / 2; };
+  let rise = null, set = null, prev = alt(0);
+  const up0 = prev > 0;
+  for (let m = 4; m <= 1440; m += 4) {
+    const v = alt(m);
+    if (prev <= 0 && v > 0 && rise === null) rise = root(m - 4, m);
+    if (prev > 0 && v <= 0 && rise !== null && set === null) set = root(m - 4, m);
+    prev = v;
+  }
+  if (rise === null && set === null) return up0 ? { rise: 0, set: 1440, polar: 'day' } : { polar: 'night' };
+  if (rise !== null && set === null) set = 1440;               // sun still up at midnight
+  if (rise === null) rise = 0;
+  return { rise, set };
+}
+const playBtn = $('play');
+let playing = null;                                         // { end, last }
+function setPlayUI(on) {
+  playBtn.setAttribute('aria-pressed', String(on));
+  const t = on ? '一時停止' : '日の出から日没まで再生';
+  playBtn.setAttribute('aria-label', t); playBtn.title = t;
+}
+function stopPlay() { if (!playing) return; playing = null; setPlayUI(false); }
+function flash(msg) {
+  hintEl.textContent = msg;
+  hintEl.classList.add('show');
+  clearTimeout(flash.t); flash.t = setTimeout(() => hintEl.classList.remove('show'), 2600);
+}
+function startPlay() {
+  const ev = sunEvents(state.clock);
+  if (ev.polar === 'night') { flash('この日は太陽が昇りません'); return; }
+  let m = state.clock.min;
+  if (m < ev.rise || m >= ev.set - 0.5) m = ev.rise;         // outside the day, or at its end: from sunrise
+  state.clock.min = m;
+  applyClock();
+  playing = { end: ev.set, last: performance.now() };
+  setPlayUI(true);
+  if (ev.polar === 'day') flash('白夜：一日中太陽が沈みません');
+}
+playBtn.addEventListener('click', () => { hideHint(); playing ? stopPlay() : startPlay(); });
+function stepPlay(t) {
+  if (!playing) return;
+  const dt = Math.min(0.1, (t - playing.last) / 1000);
+  playing.last = t;
+  const m = Math.min(playing.end, state.clock.min + dt * PLAY_RATE);
+  state.clock.min = m;
+  applyClock();
+  if (m >= playing.end) stopPlay();                         // stop at sunset, time stays there
+}
 
 // Tabs
 const tabs = [...document.querySelectorAll('.tab')];
@@ -2315,8 +2456,10 @@ document.querySelectorAll('.wbtn').forEach(b => b.addEventListener('click', () =
 }));
 
 function updateReadout() {
-  readout.innerHTML =
-    `視野<span class="num">${Math.round(state.fov)}°</span>${state.proj === 'fish' ? '魚眼' : '透視'}`;
+  const c = state.clock;
+  if (!c) return;
+  const [, mo, d] = c.date.split('-').map(Number);
+  readout.innerHTML = `${mo}月${d}日 ${fmtTz(c.tz)}<br>時刻<span class="num">${fmtClock(c.min)}</span>`;
 }
 
 // Hint
@@ -2340,6 +2483,419 @@ window.addEventListener('resize', onResize);
 if (landscapeMQ.addEventListener) landscapeMQ.addEventListener('change', () => requestAnimationFrame(onResize));
 if (window.ResizeObserver) new ResizeObserver(() => onResize()).observe(uiEl);
 
+// ─── Photo / video metadata (EXIF, QuickTime) ───────────────
+// Reads only what the sky needs: when (local clock + UTC offset), where (GPS), and which way the
+// camera looked (GPS image direction, 35 mm-equivalent focal length). No libraries.
+// Formats: JPEG, HEIC/HEIF/AVIF, PNG (eXIf), WebP (EXIF), TIFF/DNG, MOV/MP4 (Apple keys, ©xyz, mvhd).
+// src = { size, read(start, len) → Promise<Uint8Array> } so large videos are read box by box.
+
+function fileSource(file) {
+  return {
+    size: file.size,
+    read: async (start, len) => new Uint8Array(await file.slice(start, Math.min(file.size, start + len)).arrayBuffer()),
+  };
+}
+
+const ASCII = (u8, a = 0, b = u8.length) => { let s = ''; for (let i = a; i < b; i++) s += String.fromCharCode(u8[i]); return s; };
+const UTF8 = (u8) => new TextDecoder('utf-8').decode(u8);
+
+// TIFF / EXIF block → flat record of the tags we use.
+function parseTiff(u8) {
+  const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  if (u8.length < 8) return null;
+  const bo = ASCII(u8, 0, 2);
+  if (bo !== 'II' && bo !== 'MM') return null;
+  const le = bo === 'II';
+  const u16 = (o) => dv.getUint16(o, le), u32 = (o) => dv.getUint32(o, le), s32 = (o) => dv.getInt32(o, le);
+  const SIZE = { 1: 1, 2: 1, 3: 2, 4: 4, 5: 8, 7: 1, 9: 4, 10: 8 };
+  const readIfd = (off) => {
+    const out = {};
+    if (off <= 0 || off + 2 > u8.length) return out;
+    const n = u16(off);
+    for (let i = 0; i < n; i++) {
+      const e = off + 2 + 12 * i;
+      if (e + 12 > u8.length) break;
+      const tag = u16(e), type = u16(e + 2), count = u32(e + 4), sz = (SIZE[type] || 1) * count;
+      const vo = sz <= 4 ? e + 8 : u32(e + 8);
+      if (vo + sz > u8.length) continue;
+      let v;
+      if (type === 2) v = ASCII(u8, vo, vo + count).replace(/\0.*$/s, '').trim();
+      else if (type === 3) v = count === 1 ? u16(vo) : Array.from({ length: count }, (_, k) => u16(vo + 2 * k));
+      else if (type === 4) v = count === 1 ? u32(vo) : Array.from({ length: count }, (_, k) => u32(vo + 4 * k));
+      else if (type === 5 || type === 10) {
+        const rd = (k) => { const a = type === 5 ? u32(vo + 8 * k) : s32(vo + 8 * k), b = type === 5 ? u32(vo + 8 * k + 4) : s32(vo + 8 * k + 4); return b ? a / b : NaN; };
+        v = count === 1 ? rd(0) : Array.from({ length: count }, (_, k) => rd(k));
+      } else if (type === 1 || type === 7) v = count === 1 ? u8[vo] : u8.slice(vo, vo + count);
+      else continue;
+      out[tag] = v;
+    }
+    return out;
+  };
+  const ifd0 = readIfd(u32(4));
+  const exif = ifd0[0x8769] ? readIfd(ifd0[0x8769]) : {};
+  const gps = ifd0[0x8825] ? readIfd(ifd0[0x8825]) : {};
+  return { ifd0, exif, gps };
+}
+
+// EXIF record → { local, offset, gpsUTC, lat, lon, alt, dir, dirRef, f35, f, make, model }
+function exifToMeta(t) {
+  if (!t) return null;
+  const { ifd0, exif, gps } = t;
+  const m = { kind: 'exif' };
+  const dt = exif[0x9003] || exif[0x9004] || ifd0[0x0132];                // DateTimeOriginal / Digitized / DateTime
+  const dm = typeof dt === 'string' && dt.match(/^(\d{4})[:\-](\d\d)[:\-](\d\d)[ T](\d\d):(\d\d):(\d\d)/);
+  if (dm && dm[1] !== '0000') {
+    const sub = String(exif[0x9291] || exif[0x9292] || '').replace(/\D/g, '');
+    m.local = { date: `${dm[1]}-${dm[2]}-${dm[3]}`, min: +dm[4] * 60 + +dm[5] + (+dm[6] + (sub ? +('0.' + sub) : 0)) / 60 };
+  }
+  const off = exif[0x9011] || exif[0x9012] || exif[0x9010];                // OffsetTimeOriginal / Digitized / OffsetTime
+  const om = typeof off === 'string' && off.match(/^([+\-])(\d\d):?(\d\d)/);
+  if (om) m.offset = (om[1] === '-' ? -1 : 1) * (+om[2] + +om[3] / 60);
+  const dms = (v) => Array.isArray(v) ? v[0] + (v[1] || 0) / 60 + (v[2] || 0) / 3600 : v;
+  if (gps[2] != null && gps[4] != null) {
+    const lat = dms(gps[2]) * (/S/i.test(gps[1]) ? -1 : 1), lon = dms(gps[4]) * (/W/i.test(gps[3]) ? -1 : 1);
+    if (Number.isFinite(lat) && Number.isFinite(lon) && !(lat === 0 && lon === 0)) { m.lat = lat; m.lon = lon; }
+  }
+  if (Number.isFinite(gps[6])) m.alt = gps[6] * (gps[5] === 1 ? -1 : 1);
+  if (Number.isFinite(gps[0x11])) { m.dir = gps[0x11]; m.dirRef = /M/i.test(gps[0x10] || '') ? 'M' : 'T'; }
+  const gd = typeof gps[0x1d] === 'string' && gps[0x1d].match(/^(\d{4}):(\d\d):(\d\d)/);
+  if (gd && Array.isArray(gps[7])) {
+    const [h, mi, s] = gps[7];
+    m.gpsUTC = Date.UTC(+gd[1], +gd[2] - 1, +gd[3]) + ((h * 60 + mi) * 60 + s) * 1000;
+  }
+  if (exif[0xa405]) m.f35 = exif[0xa405];
+  if (Number.isFinite(exif[0x920a])) m.f = exif[0x920a];
+  if (ifd0[0x010f]) m.make = ifd0[0x010f];
+  if (ifd0[0x0110]) m.model = ifd0[0x0110];
+  return m;
+}
+
+// ISO BMFF box walking (HEIC, MOV, MP4)
+function boxes(u8, start = 0, end = u8.length) {
+  const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength), out = [];
+  let p = start;
+  while (p + 8 <= end) {
+    let size = dv.getUint32(p), hdr = 8;
+    const type = ASCII(u8, p + 4, p + 8);
+    if (size === 1) { size = Number(dv.getBigUint64(p + 8)); hdr = 16; }
+    else if (size === 0) size = end - p;
+    if (size < hdr || p + size > end) break;
+    out.push({ type, start: p, body: p + hdr, end: p + size });
+    p += size;
+  }
+  return out;
+}
+async function topBoxes(src) {
+  const out = [];
+  let p = 0;
+  while (p + 8 <= src.size && out.length < 4096) {
+    const h = await src.read(p, 16), dv = new DataView(h.buffer, h.byteOffset, h.byteLength);
+    let size = dv.getUint32(0), hdr = 8;
+    const type = ASCII(h, 4, 8);
+    if (size === 1) { size = Number(dv.getBigUint64(8)); hdr = 16; }
+    else if (size === 0) size = src.size - p;
+    if (size < hdr) break;
+    out.push({ type, start: p, body: p + hdr, end: Math.min(src.size, p + size) });
+    p += size;
+  }
+  return out;
+}
+
+// HEIC: meta → iinf (item of type 'Exif') → iloc (where its bytes are) → TIFF
+async function heicExif(src, metaBox) {
+  const u8 = await src.read(metaBox.start, metaBox.end - metaBox.start);
+  const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  const kids = boxes(u8, metaBox.body - metaBox.start + 4);                 // meta is a full box
+  const iinf = kids.find(b => b.type === 'iinf'), iloc = kids.find(b => b.type === 'iloc');
+  if (!iinf || !iloc) return null;
+  let p = iinf.body;
+  const iv = u8[p]; p += 4;
+  const nI = iv === 0 ? dv.getUint16(p) : dv.getUint32(p); p += iv === 0 ? 2 : 4;
+  let exifId = null;
+  for (const b of boxes(u8, p, iinf.end).slice(0, nI)) {
+    if (b.type !== 'infe') continue;
+    const v = u8[b.body];
+    if (v < 2) continue;
+    let q = b.body + 4;
+    const id = v === 2 ? dv.getUint16(q) : dv.getUint32(q); q += v === 2 ? 2 : 4;
+    q += 2;
+    if (ASCII(u8, q, q + 4) === 'Exif') { exifId = id; break; }
+  }
+  if (exifId === null) return null;
+  p = iloc.body;
+  const lv = u8[p]; p += 4;
+  const offSz = u8[p] >> 4, lenSz = u8[p] & 15, baseSz = u8[p + 1] >> 4, idxSz = lv > 0 ? u8[p + 1] & 15 : 0; p += 2;
+  const rdN = (n) => { let v = 0; for (let k = 0; k < n; k++) v = v * 256 + u8[p + k]; p += n; return v; };
+  const nL = lv < 2 ? rdN(2) : rdN(4);
+  for (let i = 0; i < nL; i++) {
+    const id = lv < 2 ? rdN(2) : rdN(4);
+    const method = lv > 0 ? rdN(2) & 15 : 0;
+    rdN(2);
+    const base = rdN(baseSz), nE = rdN(2), ext = [];
+    for (let e = 0; e < nE; e++) { if (idxSz) rdN(idxSz); ext.push([base + rdN(offSz), rdN(lenSz)]); }
+    if (id !== exifId) continue;
+    if (method !== 0 || !ext.length) return null;
+    const parts = [];
+    for (const [o, l] of ext) parts.push(await src.read(o, l));
+    const all = new Uint8Array(parts.reduce((a, b) => a + b.length, 0));
+    let k = 0; for (const x of parts) { all.set(x, k); k += x.length; }
+    const hdr = new DataView(all.buffer).getUint32(0);                     // offset to the TIFF header
+    return parseTiff(all.subarray(4 + hdr));
+  }
+  return null;
+}
+
+// MOV / MP4: Apple 'mdta' keys, Android/QuickTime ©xyz, and mvhd creation time (UTC)
+function quicktimeMeta(u8, base) {
+  const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength), m = { kind: 'video' };
+  const moov = boxes(u8, 0);
+  const find = (list, t) => list.find(b => b.type === t);
+  const mvhd = find(moov, 'mvhd');
+  if (mvhd) {
+    const v = u8[mvhd.body], ct = v === 1 ? Number(dv.getBigUint64(mvhd.body + 4)) : dv.getUint32(mvhd.body + 4);
+    if (ct > 0) m.utc = (ct - 2082844800) * 1000;                          // seconds since 1904-01-01 UTC
+  }
+  const iso6709 = (s) => {
+    const g = String(s).match(/^([+\-]\d+(?:\.\d+)?)([+\-]\d+(?:\.\d+)?)([+\-]\d+(?:\.\d+)?)?/);
+    if (!g) return;
+    const la = +g[1], lo = +g[2];
+    if (Number.isFinite(la) && Number.isFinite(lo) && !(la === 0 && lo === 0)) { m.lat = la; m.lon = lo; if (g[3]) m.alt = +g[3]; }
+  };
+  const udta = find(moov, 'udta');
+  const udtaKids = udta ? boxes(u8, udta.body, udta.end) : [];
+  // iPhone puts the Apple keys in moov/meta; some writers (ffmpeg) put them in moov/udta/meta
+  for (const meta of [find(moov, 'meta'), find(udtaKids, 'meta')].filter(Boolean)) {
+    // QuickTime 'meta' is a plain box; ISO 'meta' is a full box (4 more header bytes)
+    let kids = boxes(u8, meta.body, meta.end);
+    if (!kids.some(b => /^(hdlr|keys|ilst)$/.test(b.type))) kids = boxes(u8, meta.body + 4, meta.end);
+    const keysB = find(kids, 'keys'), ilst = find(kids, 'ilst');
+    if (keysB && ilst) {
+      const names = [];
+      let p = keysB.body + 4;
+      const n = dv.getUint32(p); p += 4;
+      for (let i = 0; i < n && p + 8 <= keysB.end; i++) { const sz = dv.getUint32(p); names.push(ASCII(u8, p + 8, p + sz)); p += sz; }
+      for (const it of boxes(u8, ilst.body, ilst.end)) {
+        const idx = dv.getUint32(it.start + 4), name = names[idx - 1];
+        const data = find(boxes(u8, it.body, it.end), 'data');
+        if (!name || !data) continue;
+        const val = UTF8(u8.subarray(data.body + 8, data.end));
+        if (name === 'com.apple.quicktime.creationdate') {
+          const d = val.match(/^(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:\.\d+)?(Z|([+\-])(\d\d):?(\d\d))?/);
+          if (d) {
+            m.local = { date: `${d[1]}-${d[2]}-${d[3]}`, min: +d[4] * 60 + +d[5] + +d[6] / 60 };
+            if (d[7] === 'Z') m.offset = 0;
+            else if (d[7]) m.offset = (d[8] === '-' ? -1 : 1) * (+d[9] + +d[10] / 60);
+          }
+        } else if (name === 'com.apple.quicktime.location.ISO6709') iso6709(val);
+        else if (name === 'com.apple.quicktime.make') m.make = val;
+        else if (name === 'com.apple.quicktime.model') m.model = val;
+      }
+    }
+  }
+  if (m.lat == null) {
+    const xyz = find(udtaKids, '\u00a9xyz');                              // Android / QuickTime
+    if (xyz) iso6709(ASCII(u8, xyz.body + 4, xyz.end));
+  }
+  const loci = find(udtaKids, 'loci');                                      // 3GPP location
+  if (m.lat == null && loci) {
+    let p = loci.body + 6;
+    while (p < loci.end && u8[p] !== 0) p++;
+    p += 2;
+    if (p + 12 <= loci.end) {
+      const lo = dv.getInt32(p) / 65536, la = dv.getInt32(p + 4) / 65536;
+      if (!(la === 0 && lo === 0)) { m.lat = la; m.lon = lo; }
+    }
+  }
+  return m;
+}
+
+async function readPhotoMeta(file) {
+  const src = fileSource(file);
+  const head = await src.read(0, 64);
+  let meta = null;
+  if (head[0] === 0xff && head[1] === 0xd8) {                              // JPEG: APP1 "Exif\0\0"
+    let p = 2;
+    while (p + 4 < src.size) {
+      const h = await src.read(p, 4);
+      if (h[0] !== 0xff) break;
+      const mk = h[1], len = (h[2] << 8) | h[3];
+      if (mk === 0xda || mk === 0xd9) break;
+      if (mk === 0xe1) {
+        const seg = await src.read(p + 4, len - 2);
+        if (ASCII(seg, 0, 6) === 'Exif\0\0') { meta = exifToMeta(parseTiff(seg.subarray(6))); break; }
+      }
+      p += 2 + len;
+    }
+  } else if (ASCII(head, 0, 4) === 'II*\0' || ASCII(head, 0, 4) === 'MM\0*') {
+    meta = exifToMeta(parseTiff(await src.read(0, Math.min(src.size, 64 << 20))));
+  } else if (head[0] === 0x89 && ASCII(head, 1, 4) === 'PNG') {
+    let p = 8;
+    while (p + 12 <= src.size) {
+      const h = await src.read(p, 8), len = new DataView(h.buffer).getUint32(0), t = ASCII(h, 4, 8);
+      if (t === 'eXIf') { meta = exifToMeta(parseTiff(await src.read(p + 8, len))); break; }
+      if (t === 'IDAT' || t === 'IEND') break;
+      p += 12 + len;
+    }
+  } else if (ASCII(head, 0, 4) === 'RIFF' && ASCII(head, 8, 12) === 'WEBP') {
+    let p = 12;
+    while (p + 8 <= src.size) {
+      const h = await src.read(p, 8), len = new DataView(h.buffer).getUint32(4, true), t = ASCII(h, 0, 4);
+      if (t === 'EXIF') {
+        let d = await src.read(p + 8, len);
+        if (ASCII(d, 0, 6) === 'Exif\0\0') d = d.subarray(6);
+        meta = exifToMeta(parseTiff(d)); break;
+      }
+      p += 8 + len + (len & 1);
+    }
+  } else if (ASCII(head, 4, 8) === 'ftyp' || ASCII(head, 4, 8) === 'wide' || ASCII(head, 4, 8) === 'mdat' || ASCII(head, 4, 8) === 'moov') {
+    const top = await topBoxes(src);
+    const brand = ASCII(head, 8, 12);
+    const metaB = top.find(b => b.type === 'meta'), moovB = top.find(b => b.type === 'moov');
+    if (metaB && /hei|mif|avi|hev/.test(brand)) meta = exifToMeta(await heicExif(src, metaB));
+    else if (moovB && moovB.end - moovB.start < (256 << 20)) {
+      const u8 = await src.read(moovB.body, moovB.end - moovB.body);
+      meta = quicktimeMeta(u8);
+    }
+  }
+  return meta;
+}
+
+// Metadata → clock and place. Decides the UTC offset and says where each value came from.
+// cur = the current state.clock (fallbacks). Returns { clock, notes: { time, tz, place } }.
+function metaToClock(meta, cur) {
+  const clock = { ...cur }, notes = {};
+  const roundTz = (h) => Math.round(h * 4) / 4;
+  const fromUtc = (ms, tz) => {
+    const t = new Date(ms + tz * 3600000);
+    return { date: t.toISOString().slice(0, 10), min: t.getUTCHours() * 60 + t.getUTCMinutes() + (t.getUTCSeconds() + t.getUTCMilliseconds() / 1000) / 60 };
+  };
+  if (meta.lat != null) { clock.lat = +meta.lat.toFixed(5); clock.lon = +meta.lon.toFixed(5); notes.place = 'gps'; }
+  else notes.place = 'none';
+  if (meta.local) {
+    Object.assign(clock, meta.local);
+    notes.time = 'exif';
+    if (meta.offset != null) { clock.tz = meta.offset; notes.tz = 'exif'; }
+    else if (meta.gpsUTC != null) {
+      const [y, mo, d] = meta.local.date.split('-').map(Number);
+      const asUtc = Date.UTC(y, mo - 1, d) + meta.local.min * 60000;
+      const h = roundTz((asUtc - meta.gpsUTC) / 3600000);
+      if (Math.abs(h) <= 14) { clock.tz = h; notes.tz = 'gps'; } else notes.tz = 'keep';
+    } else notes.tz = 'keep';
+  } else if (meta.utc != null || meta.gpsUTC != null) {
+    const ms = meta.utc ?? meta.gpsUTC;
+    if (meta.offset != null) { clock.tz = meta.offset; notes.tz = 'exif'; }
+    else notes.tz = 'keep';
+    Object.assign(clock, fromUtc(ms, clock.tz));
+    notes.time = 'utc';
+  } else notes.time = 'none';
+  return { clock, notes };
+}
+
+// ─── Photo import: apply the recorded time, place and view ──
+const photoIn = $('photo-in'), photoCard = $('photo-card'), phThumb = $('ph-thumb');
+const phName = $('ph-name'), phRows = $('ph-rows'), phNote = $('ph-note');
+let photo = null;                                    // { file, url, meta } — kept for the next stages (overlay, detection)
+const esc = (t) => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const SRC_LABEL = {
+  exif: ['撮影時の記録', false], gps: ['GPS 時刻との差から推定', false], utc: ['動画の記録（UTC）', false],
+  keep: ['記録なし・今の設定のまま', true], none: ['記録なし・変更していません', true],
+};
+const srcTag = (k) => { const [t, weak] = SRC_LABEL[k] || ['', true]; return `<span class="src${weak ? ' weak' : ''}">${t}</span>`; };
+const fmtLat = (v) => `${Math.abs(v).toFixed(4)}°${v >= 0 ? 'N' : 'S'}`;
+const fmtLon = (v) => `${Math.abs(v).toFixed(4)}°${v >= 0 ? 'E' : 'W'}`;
+const fmtSec = (min) => { const s = Math.floor((min % 1) * 60 + 1e-6); return fmtClock(min) + ':' + pad2(s); };
+
+function showThumb(file, url) {
+  phThumb.textContent = '';
+  const video = /^video\//.test(file.type) || /\.(mov|mp4|m4v)$/i.test(file.name);
+  const el = document.createElement(video ? 'video' : 'img');
+  el.src = url;
+  el.alt = '';
+  if (video) { el.muted = true; el.playsInline = true; el.preload = 'metadata'; el.addEventListener('loadedmetadata', () => { el.currentTime = Math.min(0.1, el.duration || 0); }); }
+  el.addEventListener('error', () => { phThumb.textContent = 'この形式はプレビューできません'; });
+  phThumb.appendChild(el);
+}
+
+// The card sits at the bottom of the panel; scroll it into view so the result is seen.
+const revealPhoto = () => requestAnimationFrame(() => photoCard.scrollIntoView({ block: 'nearest', behavior: 'smooth' }));
+
+async function importPhoto(file) {
+  if (!file) return;
+  stopPlay();
+  if (photo && photo.url) URL.revokeObjectURL(photo.url);
+  const url = URL.createObjectURL(file);
+  photo = { file, url, meta: null };
+  if (uiEl.dataset.open !== 'sun') openTab('sun');
+  photoCard.hidden = false;
+  phName.textContent = file.name;
+  showThumb(file, url);
+  phRows.innerHTML = '<dt>読み込み中</dt><dd></dd>';
+  phNote.hidden = true;
+  let meta = null;
+  try { meta = await readPhotoMeta(file); } catch (e) { console.warn('metadata', e); }
+  photo.meta = meta;
+  if (!meta || (!meta.local && meta.utc == null && meta.gpsUTC == null && meta.lat == null)) {
+    phRows.innerHTML = '<dt>記録</dt><dd>日時・位置の記録が見つかりませんでした</dd>';
+    phNote.textContent = '日時と場所は変えていません。SNS や編集アプリを通した写真は、記録が消えていることがあります。';
+    phNote.hidden = false;
+    revealPhoto();
+    return;
+  }
+  const { clock, notes } = metaToClock(meta, state.clock);
+  state.clock = clock;
+  applyClock();
+
+  // View: the recorded compass direction and the lens's angle of view, when present.
+  // state.fov is the angle across the short side, i.e. the 24 mm side of a 35 mm frame.
+  const fov = meta.f35 ? clamp(2 * Math.atan(12 / meta.f35) * RAD, ...FOV_RANGE.persp) : null;
+  if (meta.dir != null) {
+    setProj('persp');
+    state.yaw = ((meta.dir % 360) + 360) % 360;
+    const off = Math.abs(((state.yaw - state.sunAz) % 360 + 540) % 360 - 180);
+    horizonAnchor = { top: off < 60 ? state.sunAlt + 26 : 40 };      // no tilt in EXIF: frame the sky above the horizon
+    setActiveView(null);
+    setFov(fov ?? state.fov, true);
+    captureFollow();
+  } else {
+    setView('sun');
+    if (fov) setFov(fov, true);
+  }
+
+  const rows = [];
+  if (notes.time !== 'none') rows.push(['日時', `<span class="num">${clock.date} ${fmtSec(clock.min)}</span>${srcTag(notes.time)}`]);
+  else rows.push(['日時', `記録なし${srcTag('none')}`]);
+  rows.push(['時差', `<span class="num">${fmtTz(clock.tz)}</span>${srcTag(notes.tz || 'keep')}`]);
+  if (notes.place === 'gps') rows.push(['場所', `<span class="num">${fmtLat(clock.lat)} ${fmtLon(clock.lon)}</span>${meta.alt != null ? `<span class="src">標高 ${Math.round(meta.alt)} m</span>` : ''}`]);
+  else rows.push(['場所', `記録なし${srcTag('none')}`]);
+  if (meta.dir != null) rows.push(['向き', `<span class="num">${meta.dir.toFixed(1)}°</span><span class="src">${meta.dirRef === 'M' ? '磁北基準（真北から数度ずれます）' : '撮影時の方位'}</span>`]);
+  if (fov) rows.push(['画角', `<span class="num">${Math.round(fov)}°</span><span class="src">短辺方向・35 mm 換算 ${meta.f35} mm</span>`]);
+  if (meta.make || meta.model) rows.push(['機種', esc([meta.make, meta.model].filter(Boolean).join(' ').replace(/^(\w+) \1/, '$1'))]);
+  phRows.innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
+
+  const tips = [];
+  if (notes.place !== 'gps') tips.push('位置の記録がないので、場所は今の設定のままです。iPhone では写真アプリから選ぶと位置情報が外されることがあり、「ファイル」から選ぶと残ります。');
+  if (notes.tz === 'keep' && notes.time !== 'none') tips.push('時差の記録がないので、今の時差の設定で太陽の位置を計算しています。撮影地の時差と違うときは直してください。');
+  if (meta.dir == null) tips.push('向きの記録がないので、太陽の方向を表示しています。');
+  phNote.textContent = tips.join(' ');
+  phNote.hidden = !tips.length;
+  revealPhoto();
+}
+
+$('photo-btn').addEventListener('click', () => photoIn.click());
+photoIn.addEventListener('change', () => { importPhoto(photoIn.files[0]); photoIn.value = ''; });
+const dropEl = $('drop');
+let dragDepth = 0;
+const hasFiles = (e) => [...(e.dataTransfer?.types || [])].includes('Files');
+window.addEventListener('dragenter', e => { if (!hasFiles(e)) return; e.preventDefault(); dragDepth++; dropEl.classList.add('show'); });
+window.addEventListener('dragover', e => { if (hasFiles(e)) e.preventDefault(); });
+window.addEventListener('dragleave', () => { if (--dragDepth <= 0) { dragDepth = 0; dropEl.classList.remove('show'); } });
+window.addEventListener('drop', e => {
+  if (!hasFiles(e)) return;
+  e.preventDefault();
+  dragDepth = 0; dropEl.classList.remove('show');
+  importPhoto(e.dataTransfer.files[0]);
+});
+
 // ─── Start ─────────────────────────────────────────────────
 document.body.dataset.render = state.render;
 applyRefVisibility();
@@ -2350,5 +2906,3 @@ requestAnimationFrame(tick);
 </script>
 </body>
 </html>
-
-</body></html>
